@@ -25,7 +25,10 @@ const config = {
     }
   },
   cache: {
-    enable: false
+    enable: true,  // 开启持久化缓存
+    buildDependencies: {
+      config: [__filename]  // 当配置文件改变时重新缓存
+    }
   },
   logger: {
     quiet: false,
