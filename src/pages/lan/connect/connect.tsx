@@ -14,6 +14,10 @@ export default function LANConnect() {
   const [showAdvanced, setShowAdvanced] = useState(false); // 是否显示高级选项
 
   useEffect(() => {
+    // ⚠️ 【修复 Bug #2】页面加载时清理可能的残留状态
+    // 如果从大厅返回，确保清理连接状态和 DOM
+    console.log('🔄 [连接页面] 页面加载，检查连接状态');
+    
     // 检查环境
     setIsWeapp(process.env.TARO_ENV === 'weapp');
     

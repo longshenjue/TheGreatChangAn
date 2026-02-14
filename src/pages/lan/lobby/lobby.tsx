@@ -268,8 +268,13 @@ export default function LANLobby() {
       content: '确定要断开连接吗？',
       success: (res) => {
         if (res.confirm) {
+          // ⚠️ 【修复 Bug #2】断开连接并清理状态
           lanService.disconnect();
-          Taro.navigateBack();
+          
+          // 使用 redirect 而不是 navigateBack，避免页面历史堆栈问题
+          Taro.redirectTo({
+            url: '/pages/lan/connect/connect'
+          });
         }
       }
     });

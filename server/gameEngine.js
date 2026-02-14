@@ -707,6 +707,20 @@ function purchaseBuilding(player, buildingId, gameState) {
   // 检查祭天坛免费购买（仅限非传奇建筑）
   const isFree = player.canFreeBuilding && config.level !== 'legendary';
   
+  // ⚠️ 【修复 Bug】检查每回合购买次数限制
+  // 初始化购买次数追踪（如果不存在）
+  if (typeof player.hasPurchasedThisTurn === 'undefined') {
+    player.hasPurchasedThisTurn = false;
+  }
+  
+  // 免费购买不算在购买次数内
+  if (!isFree) {
+    // 如果已购买过，且没有额外购买权限，则拒绝
+    if (player.hasPurchasedThisTurn && !player.canBuyExtra) {
+      return { success: false, message: '每回合只能购买一个建筑' };
+    }
+  }
+  
   let cost = 0;
   let taxCardsToUse = 0;
   
@@ -754,6 +768,18 @@ function purchaseBuilding(player, buildingId, gameState) {
 
   // 国库税金：每次购买建筑（包括升级）时，国库+1金
   gameState.treasury += 1;
+
+  // ⚠️ 【修复 Bug】更新购买状态
+  if (!isFree) {
+    // 免费购买不算在购买次数内
+    if (!player.hasPurchasedThisTurn) {
+      // 第一次购买
+      player.hasPurchasedThisTurn = true;
+    } else if (player.canBuyExtra) {
+      // 使用了额外购买权限
+      player.canBuyExtra = false;
+    }
+  }
 
   // 特殊效果
   if (buildingId === 'legendary_guanxingtai') {
@@ -817,6 +843,7 @@ function endTurn(gameState) {
   currentPlayer.canBuyExtra = false;
   currentPlayer.canFreeBuilding = false;
   currentPlayer.grandCanalTriggered = false;
+  currentPlayer.hasPurchasedThisTurn = false;  // ⚠️ 【修复 Bug】重置购买状态
 
   // 切换玩家
   const nextIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
