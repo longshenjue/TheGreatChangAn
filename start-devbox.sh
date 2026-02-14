@@ -16,8 +16,8 @@ fi
 
 # 1. 设置环境变量（根据实际情况修改）
 echo "🔧 配置环境变量..."
-# 重要：在 Sealos DevBox 中，使用前端域名访问后端端口
-export PUBLIC_HOST="${PUBLIC_HOST:-bpuwgiqhfxzg.sealoshzh.site}"
+# 重要：在 Sealos DevBox 中，使用后端专属域名
+export PUBLIC_HOST="${PUBLIC_HOST:-byerlmoutikg.sealoshzh.site}"
 export PUBLIC_PROTOCOL="${PUBLIC_PROTOCOL:-wss}"
 export WS_PORT="${WS_PORT:-8888}"
 export HTTP_PORT="${HTTP_PORT:-8889}"
@@ -111,7 +111,7 @@ echo "======================================"
 echo ""
 echo "📱 访问地址："
 echo "   前端: https://bpuwgiqhfxzg.sealoshzh.site"
-echo "   后端: wss://$PUBLIC_HOST:$WS_PORT"
+echo "   后端: wss://$PUBLIC_HOST （Sealos 自动路由到端口 $WS_PORT）"
 echo ""
 echo "📊 监控命令："
 echo "   查看后端日志: tail -f backend.log"

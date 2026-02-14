@@ -60,7 +60,12 @@ class LANService {
         
         // 根据页面协议自动选择 ws:// 或 wss://
         const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
-        this.serverUrl = `${protocol}://${ip}:${port}`;
+        
+        // WSS 使用 443 端口时，不需要显式指定端口号（HTTPS 默认端口）
+        // WS 使用 80 端口时，也不需要显式指定端口号（HTTP 默认端口）
+        const needPort = !((protocol === 'wss' && port === 443) || (protocol === 'ws' && port === 80));
+        this.serverUrl = needPort ? `${protocol}://${ip}:${port}` : `${protocol}://${ip}`;
+        
         console.log('🔌 正在连接到局域网服务器:', this.serverUrl);
 
         // 恢复重连次数限制

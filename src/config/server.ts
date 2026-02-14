@@ -14,8 +14,8 @@ export const SERVER_CONFIG: Record<string, ServerConfig> = {
   // 生产环境（云服务器）
   // 部署时修改这里的IP地址为你的云服务器IP
   production: {
-    host: 'bpuwgiqhfxzg.sealoshzh.site',  // Sealos DevBox 前端域名（用于访问后端端口）
-    port: '8888',
+    host: 'byerlmoutikg.sealoshzh.site',  // Sealos DevBox 后端专属域名
+    port: '443',  // WSS 使用 443 端口（HTTPS 默认端口）
     protocol: 'wss',
     name: 'Sealos DevBox'
   },
