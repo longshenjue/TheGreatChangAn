@@ -14,7 +14,7 @@ export const SERVER_CONFIG: Record<string, ServerConfig> = {
   // 生产环境（云服务器）
   // 部署时修改这里的IP地址为你的云服务器IP
   production: {
-    host: 'yorgxzcefnic.sealoshzh.site',  // 👈 部署时改为云服务器IP，例如：'123.456.789.0'
+    host: 'byerlmoutikg.sealoshzh.site',  // 👈 部署时改为云服务器IP，例如：'123.456.789.0'
     port: '8888',
     protocol: 'wss',     // 暂时使用 ws，有证书后改为 wss
     name: 'sealos服务器'
