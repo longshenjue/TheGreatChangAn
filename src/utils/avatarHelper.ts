@@ -2,8 +2,9 @@
  * 头像辅助工具
  */
 
-import avatarCat from '../assets/images/cat.png';
-import avatarDog from '../assets/images/dog.png';
+// 使用 Sealos 对象存储的图片 URL（已配置公开访问）
+const avatarCat = 'https://objectstorageapi.hzh.sealos.run/joctqbne-pic/cat.png';
+const avatarDog = 'https://objectstorageapi.hzh.sealos.run/joctqbne-pic/dog.png';
 
 // 默认头像列表
 const DEFAULT_AVATARS = [
