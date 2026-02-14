@@ -16,7 +16,8 @@ fi
 
 # 1. 设置环境变量（根据实际情况修改）
 echo "🔧 配置环境变量..."
-export PUBLIC_HOST="${PUBLIC_HOST:-byerlmoutikg.sealoshzh.site}"
+# 重要：在 Sealos DevBox 中，使用前端域名访问后端端口
+export PUBLIC_HOST="${PUBLIC_HOST:-bpuwgiqhfxzg.sealoshzh.site}"
 export PUBLIC_PROTOCOL="${PUBLIC_PROTOCOL:-wss}"
 export WS_PORT="${WS_PORT:-8888}"
 export HTTP_PORT="${HTTP_PORT:-8889}"
