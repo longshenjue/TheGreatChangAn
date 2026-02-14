@@ -402,12 +402,14 @@ export default function LANConnect() {
       return;
     }
 
-    // 验证IP格式（localhost除外）
+    // 验证IP或域名格式（localhost除外）
     if (serverIP.trim().toLowerCase() !== 'localhost') {
-      const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-      if (!ipPattern.test(serverIP.trim())) {
+      const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;  // IP格式：192.168.1.1
+      const domainPattern = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;  // 域名格式
+      
+      if (!ipPattern.test(serverIP.trim()) && !domainPattern.test(serverIP.trim())) {
         Taro.showToast({
-          title: 'IP地址格式不正确',
+          title: 'IP地址或域名格式不正确',
           icon: 'none',
           duration: 2000
         });
