@@ -57,7 +57,10 @@ class LANService {
         // 暂存连接的IP（注册成功后会用服务器返回的局域网IP更新）
         const connectIP = ip;
         const connectPort = port;
-        this.serverUrl = `ws://${ip}:${port}`;
+        
+        // 根据页面协议自动选择 ws:// 或 wss://
+        const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
+        this.serverUrl = `${protocol}://${ip}:${port}`;
         console.log('🔌 正在连接到局域网服务器:', this.serverUrl);
 
         // 恢复重连次数限制
@@ -499,7 +502,7 @@ class LANService {
 
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
-      const [, ip, port] = this.serverUrl.match(/ws:\/\/(.+):(\d+)/) || [];
+      const [, ip, port] = this.serverUrl.match(/wss?:\/\/(.+):(\d+)/) || [];
       if (ip && port) {
         this.connect(ip, parseInt(port)).catch(() => {
           // 重连失败会自动再次安排重连
