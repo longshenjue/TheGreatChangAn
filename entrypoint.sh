@@ -1,16 +1,38 @@
 #!/bin/bash
 # Sealos 应用启动脚本
-# ⚠️ 重要：构建必须在发布前完成（npm run build:h5）
+# ⚠️ DevBox 发布时 dist 目录不会包含（在 .gitignore 中）
+# 因此需要在首次启动时构建
 
 set -e
 
 echo "🚀 启动盛世长安应用..."
 
-# 1. 检查构建产物
+# 1. 检查并构建前端（如果需要）
 if [ ! -d "dist" ]; then
-  echo "❌ 错误：未找到 dist 目录"
-  echo "   请在发布前运行: npm run build:h5"
-  exit 1
+  echo "📦 未找到构建产物，开始构建前端..."
+  echo "   这可能需要 1-2 分钟，请耐心等待..."
+  
+  # 构建前注入环境变量
+  export BACKEND_HOST="${PUBLIC_HOST:-localhost}"
+  if [ "${PUBLIC_PROTOCOL}" = "wss" ]; then
+    export BACKEND_PORT="443"
+  else
+    export BACKEND_PORT="${WS_PORT:-8888}"
+  fi
+  export BACKEND_PROTOCOL="${PUBLIC_PROTOCOL:-wss}"
+  
+  npm run build:h5
+  
+  if [ ! -d "dist" ]; then
+    echo "❌ 构建失败：dist 目录未生成"
+    exit 1
+  fi
+  
+  echo "✅ 构建完成！"
+  echo ""
+else
+  echo "✅ 找到构建产物，跳过构建步骤"
+  echo ""
 fi
 
 # 2. 显示环境配置
