@@ -5,7 +5,13 @@
 
 set -e
 
+# 确保在正确的目录中运行
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 echo "🚀 启动盛世长安应用..."
+echo "📂 工作目录: $(pwd)"
+echo ""
 
 # 1. 检查并构建前端（如果需要）
 if [ ! -d "dist" ]; then

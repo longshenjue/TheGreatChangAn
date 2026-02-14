@@ -71,7 +71,16 @@ hub.hzh.sealos.run/ns-joctqbne/changean-server:v1.0.0
 #### 1️⃣ 创建应用
 
 - **镜像地址**：使用上面的镜像地址
-- **启动命令**：留空（会自动使用 entrypoint.sh）
+- **CPU**：建议 0.5 Core 以上
+- **内存**：建议 512 M 以上
+
+**⚠️ 重要：高级配置**
+- **启动命令**：留空（推荐）
+- **运行命令**：留空（推荐）
+
+如果必须手动指定，使用：
+- **启动命令**：`/bin/bash`
+- **运行命令**：`-c ./entrypoint.sh`（注意：不要写绝对路径，不要加参数）
 
 #### 2️⃣ 配置环境变量
 
@@ -133,14 +142,29 @@ curl http://your-app-domain:8889/status
 ✅ 构建完成！
 ```
 
-### 2. 应用启动后无法连接后端
+### 2. 启动时报错：找不到 package.json
+
+**错误信息**：
+```
+npm error path /home/devbox/project/package.json
+npm error enoent Could not read package.json
+```
+
+**原因**：工作目录不正确，或启动命令配置错误。
+
+**解决**：
+1. **方案1（推荐）**：启动命令和运行命令都留空
+2. **方案2**：使用相对路径 `./entrypoint.sh`，不要用绝对路径
+3. 检查 entrypoint.sh 是否有 `cd` 到正确目录的代码
+
+### 3. 应用启动后无法连接后端
 
 **检查**：
 - 环境变量 `PUBLIC_HOST` 是否正确设置
 - 后端域名是否可访问（不是前端域名）
 - 防火墙是否开放 8888 端口
 
-### 3. 前端页面显示但后端无响应
+### 4. 前端页面显示但后端无响应
 
 **检查后端日志**：
 ```bash
@@ -160,6 +184,41 @@ curl http://localhost:8889/status
 - [Sealos 应用启动配置](https://sealos.run/docs/guides/fundamentals/entrypoint-sh)
 - [Sealos 环境变量配置](https://sealos.run/docs/guides/app-management/environment-variables)
 - [项目部署指南](./DEPLOYMENT.md)
+
+---
+
+## 📋 部署配置检查清单
+
+在部署前，确认以下配置都正确：
+
+### ✅ 基础配置
+- [ ] 镜像地址正确（`hub.hzh.sealos.run/ns-xxx/changean-server:v1.x.x`）
+- [ ] CPU ≥ 0.5 Core
+- [ ] 内存 ≥ 512 M
+
+### ✅ 网络配置
+- [ ] 暴露端口 8080（前端）
+- [ ] 暴露端口 8888（后端 WebSocket）
+- [ ] 记下 8888 端口对应的域名（例如：`uzmebucelwbk.sealoshzh.site`）
+
+### ✅ 高级配置
+- [ ] **启动命令**：留空（推荐）
+- [ ] **运行命令**：留空（推荐）
+- [ ] **不要使用绝对路径**（如 `/home/devbox/project/entrypoint.sh`）
+- [ ] **不要添加额外参数**（如 `prod`）
+
+### ✅ 环境变量
+- [ ] `PUBLIC_HOST` = 8888 端口的域名（重要！）
+- [ ] `PUBLIC_PROTOCOL` = `wss`
+- [ ] `WS_PORT` = `8888`
+- [ ] `HTTP_PORT` = `8889`
+- [ ] `NODE_ENV` = `production`
+
+### ✅ 验证步骤
+1. 部署后等待 1-2 分钟（首次构建）
+2. 查看应用日志，确认看到 "✅ 构建完成！"
+3. 访问前端域名（8080 端口）
+4. 测试快速连接或直连模式
 
 ---
 
