@@ -12,7 +12,12 @@ const config = {
   sourceRoot: 'src',
   outputRoot: 'dist',
   plugins: [],
-  defineConstants: {},
+  defineConstants: {
+    // 从环境变量注入服务器配置
+    BACKEND_HOST: JSON.stringify(process.env.BACKEND_HOST || ''),
+    BACKEND_PORT: JSON.stringify(process.env.BACKEND_PORT || '443'),
+    BACKEND_PROTOCOL: JSON.stringify(process.env.BACKEND_PROTOCOL || 'wss'),
+  },
   copy: {
     patterns: [],
     options: {}

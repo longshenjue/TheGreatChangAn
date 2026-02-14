@@ -12,12 +12,12 @@ export interface ServerConfig {
 
 export const SERVER_CONFIG: Record<string, ServerConfig> = {
   // 生产环境（云服务器）
-  // 部署时修改这里的IP地址为你的云服务器IP
+  // 优先使用构建时注入的环境变量，否则使用默认值
   production: {
-    host: 'byerlmoutikg.sealoshzh.site',  // Sealos DevBox 后端专属域名
-    port: '443',  // WSS 使用 443 端口（HTTPS 默认端口）
-    protocol: 'wss',
-    name: 'Sealos DevBox'
+    host: typeof BACKEND_HOST !== 'undefined' && BACKEND_HOST ? BACKEND_HOST : 'byerlmoutikg.sealoshzh.site',
+    port: typeof BACKEND_PORT !== 'undefined' && BACKEND_PORT ? BACKEND_PORT : '443',
+    protocol: (typeof BACKEND_PROTOCOL !== 'undefined' && BACKEND_PROTOCOL ? BACKEND_PROTOCOL : 'wss') as 'ws' | 'wss',
+    name: '生产服务器'
   },
   
   // 开发环境（本地测试）

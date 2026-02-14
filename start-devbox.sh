@@ -37,8 +37,15 @@ else
 fi
 echo ""
 
-# 3. 构建前端
+# 3. 构建前端（注入环境变量）
 echo "🎨 构建前端..."
+echo "   注入后端配置: $PUBLIC_HOST:$WS_PORT ($PUBLIC_PROTOCOL)"
+
+# 将后端配置注入到前端构建
+export BACKEND_HOST="$PUBLIC_HOST"
+export BACKEND_PORT="443"  # WSS 使用 443
+export BACKEND_PROTOCOL="$PUBLIC_PROTOCOL"
+
 npm run build:h5
 echo ""
 
