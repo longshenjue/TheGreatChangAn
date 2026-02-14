@@ -1,0 +1,48 @@
+/**
+ * 全局样式 - Taro组件样式重置
+ * 
+ * ⚠️ 注意：不要在这里重置 taro-button-core 的基本样式！
+ * 原因：全局重置会覆盖所有局部样式，导致局部样式失效
+ * 正确做法：在各个页面的 SCSS 中针对性地重置
+ */
+
+// ========== 仅重置 Taro Button 的伪元素 ==========
+taro-button-core {
+  // 仅移除伪元素（Taro内置样式用了!important，所以这里也必须用）
+  &::before,
+  &::after {
+    display: none !important;
+    content: none !important;
+    border: none !important;
+  }
+}
+
+// ========== Taro Input 组件重置 ==========
+taro-input-core {
+  display: block;
+  box-sizing: border-box;
+  
+  .weui-input {
+    all: unset;
+    display: block;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    font-size: inherit;
+    color: inherit;
+    text-align: inherit;
+  }
+}
+
+// ========== Taro View 组件重置 ==========
+taro-view-core {
+  display: block;
+  box-sizing: border-box;
+}
+
+// ========== Taro ScrollView 组件重置 ==========
+taro-scroll-view-core {
+  display: block;
+  box-sizing: border-box;
+  overflow: hidden;
+}

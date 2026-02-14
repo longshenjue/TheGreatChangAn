@@ -1,0 +1,84 @@
+{
+  "prosperity": [
+    {
+      "doubleNumber": 1,
+      "name": "甘霖",
+      "description": "掷出者名下每有一张【水】建筑，从银行领取 2金",
+      "effect": "gainGoldPerWater_2"
+    },
+    {
+      "doubleNumber": 2,
+      "name": "回春",
+      "description": "掷出者名下每有一张【木】建筑，从银行领取 2金",
+      "effect": "gainGoldPerWood_2"
+    },
+    {
+      "doubleNumber": 3,
+      "name": "地灵",
+      "description": "掷出者名下每有一张【土】建筑，从银行领取 2金",
+      "effect": "gainGoldPerEarth_2"
+    },
+    {
+      "doubleNumber": 4,
+      "name": "烛照",
+      "description": "掷出者名下每有一张【火】建筑，从银行领取 2金",
+      "effect": "gainGoldPerFire_2"
+    },
+    {
+      "doubleNumber": 5,
+      "name": "瑞雪",
+      "description": "掷出者名下每有一张【金】建筑，从银行领取 2金",
+      "effect": "gainGoldPerMetal_2"
+    },
+    {
+      "doubleNumber": 6,
+      "name": "盛世",
+      "description": "掷出者直接从银行领取奖励 10金",
+      "effect": "gainGold_10"
+    }
+  ],
+  "chaos": [
+    {
+      "doubleNumber": 1,
+      "name": "洪涝",
+      "description": "所有【水】建筑强制结算，收益 x3",
+      "effect": "waterSettlement_x3",
+      "punishmentDescription": "拥有【火】建筑的玩家，每张卡向国库交 3金"
+    },
+    {
+      "doubleNumber": 2,
+      "name": "大风",
+      "description": "所有【木】建筑强制结算，收益 x3",
+      "effect": "woodSettlement_x3",
+      "punishmentDescription": "拥有【土】建筑的玩家，每张卡向国库交 3金"
+    },
+    {
+      "doubleNumber": 3,
+      "name": "地动",
+      "description": "所有【土】建筑强制结算，收益 x3",
+      "effect": "earthSettlement_x3",
+      "punishmentDescription": "拥有【金】建筑的玩家，每张卡向国库交 3金"
+    },
+    {
+      "doubleNumber": 4,
+      "name": "大旱",
+      "description": "所有【火】建筑强制结算，抢夺 x3",
+      "effect": "fireSettlement_x3",
+      "punishmentDescription": "拥有【水】建筑的玩家，每张卡向国库交 3金"
+    },
+    {
+      "doubleNumber": 5,
+      "name": "霜降",
+      "description": "所有【金】建筑强制结算，收益 x3",
+      "effect": "metalSettlement_x3",
+      "punishmentDescription": "拥有【木】建筑的玩家，每张卡向国库交 3金"
+    },
+    {
+      "doubleNumber": 6,
+      "name": "日食",
+      "description": "【天坛共鸣】：立即获得10金，如果玩家拥有【祭天坛】则获取国库中全部的钱，如果没有【祭天坛】，则获取国库一半的钱",
+      "effect": "eclipse",
+      "punishmentDescription": "【国祭】：之后其他所有人强制向国库缴纳祭天税，金额等于其建筑总数 x 1金"
+    }
+  ]
+}

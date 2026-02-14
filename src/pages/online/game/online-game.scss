@@ -1,0 +1,461 @@
+// 在线游戏额外样式（补充game.scss）
+.online-game-container {
+  // 顶部信息栏
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25rpx;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 15rpx;
+    margin-bottom: 20rpx;
+    border: 2rpx solid rgba(255, 215, 0, 0.3);
+
+    .current-turn {
+      display: flex;
+      align-items: center;
+      gap: 10rpx;
+
+      .turn-label {
+        font-size: 28rpx;
+        color: rgba(255, 215, 0, 0.8);
+      }
+
+      .turn-player {
+        font-size: 32rpx;
+        font-weight: bold;
+        color: #ffd700;
+
+        &.my-turn {
+          color: #00ff00;
+          text-shadow: 0 0 10rpx rgba(0, 255, 0, 0.5);
+        }
+      }
+    }
+
+    .turn-count {
+      font-size: 26rpx;
+      color: rgba(255, 215, 0, 0.7);
+    }
+  }
+
+  // 玩家信息卡片
+  .players-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15rpx;
+    margin-bottom: 20rpx;
+
+    .player-card {
+      padding: 20rpx;
+      background: rgba(139, 69, 19, 0.3);
+      border: 2rpx solid rgba(255, 215, 0, 0.3);
+      border-radius: 12rpx;
+      transition: all 0.3s;
+
+      &.active {
+        border-color: #ffd700;
+        background: rgba(255, 215, 0, 0.2);
+        box-shadow: 0 0 15rpx rgba(255, 215, 0, 0.5);
+      }
+
+      &.me {
+        border-color: #00ff00;
+        background: rgba(0, 255, 0, 0.1);
+      }
+
+      .player-name {
+        display: block;
+        font-size: 28rpx;
+        font-weight: bold;
+        color: #ffd700;
+        margin-bottom: 10rpx;
+      }
+
+      .player-gold,
+      .player-buildings {
+        display: block;
+        font-size: 24rpx;
+        color: rgba(255, 215, 0, 0.8);
+        margin: 5rpx 0;
+      }
+    }
+  }
+
+  // 骰子区域
+  .dice-area {
+    padding: 25rpx;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 15rpx;
+    margin-bottom: 20rpx;
+    text-align: center;
+    border: 2rpx solid rgba(255, 215, 0, 0.3);
+
+    .dice-title {
+      display: block;
+      font-size: 28rpx;
+      color: rgba(255, 215, 0, 0.8);
+      margin-bottom: 15rpx;
+    }
+
+    .dice-results {
+      display: flex;
+      justify-content: center;
+      gap: 20rpx;
+      margin-bottom: 15rpx;
+
+      .dice-item {
+        width: 100rpx;
+        height: 100rpx;
+        background: #ffffff;
+        border-radius: 15rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.3);
+
+        .dice-value {
+          font-size: 48rpx;
+          font-weight: bold;
+          color: #8b4513;
+        }
+      }
+    }
+
+    .double-badge {
+      display: inline-block;
+      padding: 8rpx 20rpx;
+      background: rgba(255, 0, 0, 0.3);
+      color: #ff6b6b;
+      border-radius: 10rpx;
+      font-size: 24rpx;
+      font-weight: bold;
+    }
+  }
+
+  // 操作按钮区域
+  .actions-area {
+    margin-bottom: 20rpx;
+
+    .dice-buttons,
+    .turn-actions {
+      display: flex;
+      gap: 20rpx;
+
+      .action-btn {
+        flex: 1;
+        padding: 30rpx;
+        border: none;
+        border-radius: 15rpx;
+        font-size: 30rpx;
+        font-weight: bold;
+        box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.3);
+
+        &:active {
+          transform: scale(0.95);
+        }
+
+        &[disabled] {
+          opacity: 0.5;
+          transform: none;
+        }
+      }
+
+      .roll-one,
+      .roll-two {
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #8b4513;
+      }
+
+      .purchase-btn {
+        background: rgba(50, 205, 50, 0.5);
+        color: #ffffff;
+      }
+
+      .end-turn-btn {
+        background: rgba(139, 69, 19, 0.8);
+        color: #ffd700;
+        border: 2rpx solid rgba(255, 215, 0, 0.5);
+      }
+    }
+
+    .waiting-hint {
+      padding: 40rpx;
+      text-align: center;
+      background: rgba(100, 100, 100, 0.3);
+      border-radius: 15rpx;
+      border: 2rpx dashed rgba(255, 215, 0, 0.3);
+
+      .waiting-text {
+        font-size: 28rpx;
+        color: rgba(255, 215, 0, 0.7);
+      }
+    }
+  }
+
+  // 结算弹窗
+  .settlement-modal,
+  .building-shop-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+
+    .modal-content {
+      width: 85%;
+      max-height: 80vh;
+      background: linear-gradient(180deg, #2a1200 0%, #1a0a00 100%);
+      border-radius: 20rpx;
+      padding: 40rpx;
+      border: 3rpx solid rgba(255, 215, 0, 0.5);
+      box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+
+      .modal-title {
+        display: block;
+        font-size: 36rpx;
+        font-weight: bold;
+        color: #ffd700;
+        text-align: center;
+        margin-bottom: 30rpx;
+        padding-bottom: 20rpx;
+        border-bottom: 2rpx solid rgba(255, 215, 0, 0.3);
+      }
+
+      .settlements-list {
+        max-height: 50vh;
+        overflow-y: auto;
+        margin-bottom: 30rpx;
+
+        .settlement-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20rpx;
+          background: rgba(139, 69, 19, 0.3);
+          border-radius: 12rpx;
+          margin-bottom: 15rpx;
+          border: 2rpx solid rgba(255, 215, 0, 0.3);
+
+          .player-name {
+            font-size: 28rpx;
+            color: #ffd700;
+            font-weight: bold;
+          }
+
+          .building-name {
+            font-size: 26rpx;
+            color: rgba(255, 215, 0, 0.8);
+          }
+
+          .amount {
+            font-size: 30rpx;
+            font-weight: bold;
+
+            &.positive {
+              color: #90EE90;
+            }
+
+            &.negative {
+              color: #ff6b6b;
+            }
+          }
+        }
+      }
+
+      &.shop-content {
+        max-height: 85vh;
+
+        .buildings-list {
+          flex: 1;
+          overflow-y: auto;
+          margin-bottom: 20rpx;
+
+          .element-group {
+            margin-bottom: 25rpx;
+
+            .element-header {
+              padding: 15rpx 20rpx;
+              border-radius: 10rpx;
+              margin-bottom: 15rpx;
+
+              .element-name {
+                font-size: 30rpx;
+                font-weight: bold;
+                color: #ffffff;
+                text-shadow: 2rpx 2rpx 4rpx rgba(0, 0, 0, 0.5);
+              }
+            }
+
+            .building-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 20rpx;
+              background: rgba(139, 69, 19, 0.3);
+              border-radius: 12rpx;
+              margin-bottom: 12rpx;
+              border: 2rpx solid rgba(255, 215, 0, 0.3);
+
+              .building-info {
+                flex: 1;
+                margin-right: 15rpx;
+
+                .building-header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 8rpx;
+
+                  .building-name {
+                    font-size: 28rpx;
+                    font-weight: bold;
+                    color: #ffd700;
+                  }
+
+                  .building-cost {
+                    font-size: 26rpx;
+                    color: #ffed4e;
+                    font-weight: bold;
+                  }
+                }
+
+                .building-details {
+                  display: flex;
+                  gap: 20rpx;
+
+                  .building-stock,
+                  .building-owned {
+                    font-size: 24rpx;
+                    color: rgba(255, 215, 0, 0.7);
+                  }
+
+                  .building-owned {
+                    color: #90EE90;
+                  }
+                }
+              }
+
+              .buy-btn {
+                padding: 12rpx 30rpx;
+                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+                color: #8b4513;
+                border: none;
+                border-radius: 10rpx;
+                font-size: 26rpx;
+                font-weight: bold;
+                white-space: nowrap;
+
+                &:active {
+                  transform: scale(0.95);
+                }
+
+                &.disabled,
+                &[disabled] {
+                  background: rgba(100, 100, 100, 0.5);
+                  color: rgba(255, 255, 255, 0.5);
+                  transform: none;
+                }
+              }
+            }
+          }
+        }
+
+        .shop-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: 20rpx;
+          border-top: 2rpx solid rgba(255, 215, 0, 0.3);
+
+          .player-gold {
+            font-size: 28rpx;
+            font-weight: bold;
+            color: #ffd700;
+          }
+
+          .close-btn {
+            padding: 15rpx 40rpx;
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border: 2rpx solid rgba(255, 215, 0, 0.5);
+            border-radius: 12rpx;
+            font-size: 28rpx;
+            font-weight: bold;
+
+            &:active {
+              background: rgba(255, 215, 0, 0.3);
+            }
+          }
+        }
+      }
+
+      .close-btn {
+        width: 100%;
+        padding: 25rpx;
+        background: rgba(255, 215, 0, 0.2);
+        color: #ffd700;
+        border: 2rpx solid rgba(255, 215, 0, 0.5);
+        border-radius: 15rpx;
+        font-size: 30rpx;
+        font-weight: bold;
+
+        &:active {
+          background: rgba(255, 215, 0, 0.3);
+        }
+      }
+    }
+  }
+
+  // 消息提示
+  .message-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30rpx 50rpx;
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    border-radius: 15rpx;
+    font-size: 28rpx;
+    z-index: 9999;
+  }
+
+  // 底部区域
+  .game-footer {
+    padding: 20rpx 0;
+
+    .exit-btn {
+      width: 100%;
+      padding: 25rpx;
+      background: rgba(220, 20, 60, 0.3);
+      color: #ff6b6b;
+      border: 2rpx solid rgba(220, 20, 60, 0.5);
+      border-radius: 15rpx;
+      font-size: 28rpx;
+
+      &:active {
+        background: rgba(220, 20, 60, 0.5);
+      }
+    }
+  }
+
+  // 加载状态
+  &.loading-state {
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+
+    .loading-text {
+      font-size: 32rpx;
+      color: #ffd700;
+    }
+  }
+}

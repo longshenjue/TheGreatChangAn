@@ -1,0 +1,388 @@
+// SASS 变量定义
+$text-primary: #d4af37;
+$text-secondary: rgba(212, 175, 55, 0.7);
+$secondary-color: #d4af37;
+$gold: #d4af37;
+
+// 中国风边框 Mixin
+@mixin chinese-border {
+  border: 2px solid rgba(212, 175, 55, 0.5);
+  box-shadow: 
+    0 0 10px rgba(212, 175, 55, 0.3),
+    inset 0 0 10px rgba(212, 175, 55, 0.1);
+}
+
+.index-container {
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 30px;
+  background-color: #1a0a00 !important;
+  background-image: 
+    linear-gradient(180deg, #2d1810 0%, #1a0a00 50%, #2d1810 100%),
+    radial-gradient(ellipse at 20% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+  position: relative;
+  box-sizing: border-box;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(139, 0, 0, 0.15) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.title-section {
+  text-align: center;
+  margin-bottom: 60px;
+  position: relative;
+
+  .title-decoration {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, $secondary-color, transparent);
+    margin: 20px auto;
+    max-width: 400px;
+    
+    &.top {
+      margin-bottom: 30px;
+    }
+    
+    &.bottom {
+      margin-top: 30px;
+    }
+  }
+
+  .main-title {
+    display: block;
+    font-size: 72px;
+    font-weight: bold;
+    color: $secondary-color;
+    text-shadow: 
+      0 0 20px rgba(212, 175, 55, 0.6),
+      2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 12px;
+    margin-bottom: 20px;
+  }
+
+  .subtitle {
+    display: block;
+    font-size: 28px;
+    color: $text-primary;
+    letter-spacing: 6px;
+    opacity: 0.9;
+  }
+}
+
+.settings-section {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.setting-card {
+  background: rgba(26, 10, 0, 0.85);
+  @include chinese-border;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  .setting-label {
+    display: block;
+    font-size: 32px;
+    color: $secondary-color;
+    margin-bottom: 24px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.player-count-selector {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+
+  .count-option {
+    flex: 1;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: rgba(212, 175, 55, 0.7);
+    }
+
+    &.active {
+      background: rgba(212, 175, 55, 0.3);
+      border-color: $secondary-color;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .count-text {
+      font-size: 32px;
+      color: $text-primary;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    }
+  }
+}
+
+.name-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .name-input-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 15px;
+    align-items: center;
+
+    .name-index {
+      font-size: 28px;
+      color: $text-secondary;
+      text-align: left;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .name-input {
+      width: 100%;
+      height: 70px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(212, 175, 55, 0.5);
+      border-radius: 8px;
+      padding: 0 20px;
+      font-size: 28px;
+      color: $text-primary;
+      box-sizing: border-box;
+      line-height: 66px; // height - border(2*2) = 70 - 4 = 66px
+
+      .weui-input {
+        height: 66px;
+        line-height: 66px;
+        font-size: 28px;
+        color: $text-primary;
+      }
+
+      &:focus {
+        border-color: $secondary-color;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        background: rgba(0, 0, 0, 0.7);
+      }
+    }
+  }
+}
+
+.weather-selector {
+  display: flex;
+  gap: 20px;
+
+  .weather-option {
+    flex: 1;
+    padding: 30px 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: rgba(212, 175, 55, 0.7);
+    }
+
+    &.active {
+      background: rgba(212, 175, 55, 0.3);
+      border-color: $secondary-color;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .weather-name {
+      display: block;
+      font-size: 32px;
+      color: $text-primary;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .weather-desc {
+      display: block;
+      font-size: 24px;
+      color: $text-secondary;
+      opacity: 0.9;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+    }
+  }
+}
+
+.legendary-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  .legendary-group {
+    .group-title {
+      display: block;
+      font-size: 26px;
+      color: $secondary-color;
+      margin-bottom: 15px;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .legendary-item {
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(212, 175, 55, 0.5);
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 12px;
+      transition: all 0.3s;
+      cursor: pointer;
+
+      &:hover:not(.disabled) {
+        background: rgba(212, 175, 55, 0.15);
+        border-color: rgba(212, 175, 55, 0.7);
+      }
+
+      &.active {
+        background: rgba(212, 175, 55, 0.3);
+        border-color: $secondary-color;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+
+      &.disabled {
+        opacity: 0.7;
+        background: rgba(82, 196, 26, 0.2);
+        border-color: rgba(82, 196, 26, 0.6);
+        cursor: not-allowed;
+      }
+
+      .legendary-name {
+        display: block;
+        font-size: 28px;
+        color: $text-primary;
+        font-weight: bold;
+        margin-bottom: 6px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+      }
+
+      .legendary-desc {
+        display: block;
+        font-size: 24px;
+        color: $text-secondary;
+        opacity: 0.9;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+      }
+    }
+  }
+}
+
+.rules-card {
+  .rules-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .rule-item {
+      font-size: 26px;
+      color: $text-primary;
+      line-height: 1.6;
+      opacity: 0.95;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+    }
+  }
+}
+
+.start-button-container {
+  margin: 60px 0 40px;
+  display: flex;
+  justify-content: center;
+
+  .start-button {
+    width: 400px;
+    height: 100px !important;
+    background: linear-gradient(135deg, #8B0000, #DC143C) !important;
+    @include chinese-border;
+    border: 3px solid $secondary-color !important;
+    border-radius: 20px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(139, 0, 0, 0.6), 
+                inset 0 2px 0 rgba(255, 255, 255, 0.15),
+                0 0 30px rgba(220, 20, 60, 0.4) !important;
+
+    // 重置Taro Button默认样式
+    taro-button-core {
+      width: 100%;
+      height: 100%;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+
+      &::after {
+        border: none !important;
+      }
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(139, 0, 0, 0.8), 
+                  inset 0 2px 0 rgba(255, 255, 255, 0.2),
+                  0 0 40px rgba(220, 20, 60, 0.6) !important;
+    }
+
+    &:active {
+      transform: translateY(2px);
+      box-shadow: 0 4px 12px rgba(139, 0, 0, 0.6),
+                  0 0 20px rgba(220, 20, 60, 0.3) !important;
+    }
+
+    .button-text {
+      font-size: 36px;
+      color: $text-primary;
+      font-weight: bold;
+      letter-spacing: 8px;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);
+    }
+  }
+}
+
+.footer-decoration {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(212, 175, 55, 0.4);
+
+  .footer-text {
+    font-size: 24px;
+    color: $text-secondary;
+    opacity: 0.8;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+  }
+}

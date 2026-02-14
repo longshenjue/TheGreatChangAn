@@ -1,0 +1,377 @@
+// 个人中心样式
+.profile-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #2a1200 0%, #1a0a00 100%);
+  padding: 20rpx;
+  box-sizing: border-box;
+
+  &.loading-state,
+  &.error-state {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .loading-text,
+    .error-text {
+      font-size: 32rpx;
+      color: #ffd700;
+      margin-bottom: 30rpx;
+    }
+
+    .retry-btn {
+      padding: 20rpx 50rpx;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      color: #8b4513;
+      border: none;
+      border-radius: 15rpx;
+      font-size: 28rpx;
+      font-weight: bold;
+    }
+  }
+
+  // 头部
+  .header {
+    position: relative;
+    padding: 30rpx;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 20rpx;
+    margin-bottom: 30rpx;
+    border: 2rpx solid rgba(255, 215, 0, 0.3);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .title {
+      font-size: 40rpx;
+      font-weight: bold;
+      color: #ffd700;
+      text-shadow: 2rpx 2rpx 4rpx rgba(0, 0, 0, 0.5);
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 50%;
+      right: 25rpx;
+      transform: translateY(-50%);
+      width: 100rpx !important;
+      height: 50rpx !important;
+      min-height: 50rpx !important;
+      line-height: 50rpx !important;
+      padding: 0 !important;
+      background: rgba(220, 20, 60, 0.3) !important;
+      color: #ff6b6b !important;
+      border: 2rpx solid rgba(220, 20, 60, 0.5) !important;
+      border-radius: 8rpx !important;
+      font-size: 26rpx !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+
+      &:active {
+        background: rgba(220, 20, 60, 0.5) !important;
+      }
+    }
+  }
+
+  // 内容区域
+  .content {
+    max-height: calc(100vh - 120rpx);
+
+    // 用户信息卡片
+    .user-card {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(139, 69, 19, 0.3) 100%);
+      border-radius: 25rpx;
+      padding: 40rpx;
+      margin-bottom: 30rpx;
+      border: 3rpx solid rgba(255, 215, 0, 0.5);
+      box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.3);
+
+      .user-avatar-section {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30rpx;
+
+        .user-avatar {
+          width: 120rpx;
+          height: 120rpx;
+          border-radius: 50%;
+          border: 4rpx solid rgba(255, 215, 0, 0.8);
+          margin-right: 30rpx;
+          box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.3);
+        }
+
+        .user-info {
+          flex: 1;
+
+          .user-nickname {
+            display: block;
+            font-size: 36rpx;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 10rpx;
+          }
+
+          .user-id {
+            font-size: 24rpx;
+            color: rgba(255, 215, 0, 0.6);
+          }
+        }
+      }
+
+      .score-section {
+        text-align: center;
+        padding: 30rpx;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 15rpx;
+        border: 2rpx solid rgba(255, 215, 0, 0.3);
+
+        .score-main {
+          .score-label {
+            display: block;
+            font-size: 26rpx;
+            color: rgba(255, 215, 0, 0.7);
+            margin-bottom: 10rpx;
+          }
+
+          .score-value {
+            display: block;
+            font-size: 56rpx;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20rpx rgba(255, 215, 0, 0.6);
+          }
+        }
+      }
+    }
+
+    // 统计区域
+    .stats-section {
+      background: rgba(255, 215, 0, 0.05);
+      border-radius: 20rpx;
+      padding: 30rpx;
+      margin-bottom: 30rpx;
+      border: 2rpx solid rgba(255, 215, 0, 0.2);
+
+      .section-title {
+        display: block;
+        font-size: 32rpx;
+        font-weight: bold;
+        color: #ffd700;
+        margin-bottom: 25rpx;
+        padding-bottom: 15rpx;
+        border-bottom: 2rpx solid rgba(255, 215, 0, 0.2);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20rpx;
+
+        .stat-item {
+          background: rgba(139, 69, 19, 0.3);
+          border-radius: 15rpx;
+          padding: 30rpx;
+          text-align: center;
+          border: 2rpx solid rgba(255, 215, 0, 0.3);
+
+          .stat-value {
+            display: block;
+            font-size: 48rpx;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 10rpx;
+
+            &.win {
+              color: #90EE90;
+            }
+          }
+
+          .stat-label {
+            font-size: 26rpx;
+            color: rgba(255, 215, 0, 0.7);
+          }
+        }
+      }
+    }
+
+    // 游戏记录区域
+    .records-section {
+      background: rgba(255, 215, 0, 0.05);
+      border-radius: 20rpx;
+      padding: 30rpx;
+      margin-bottom: 30rpx;
+      border: 2rpx solid rgba(255, 215, 0, 0.2);
+
+      .section-title {
+        display: block;
+        font-size: 32rpx;
+        font-weight: bold;
+        color: #ffd700;
+        margin-bottom: 25rpx;
+        padding-bottom: 15rpx;
+        border-bottom: 2rpx solid rgba(255, 215, 0, 0.2);
+      }
+
+      // 空状态
+      .empty-state {
+        padding: 80rpx 40rpx;
+        text-align: center;
+
+        .empty-text {
+          display: block;
+          font-size: 30rpx;
+          color: rgba(255, 215, 0, 0.7);
+          margin-bottom: 15rpx;
+        }
+
+        .empty-hint {
+          display: block;
+          font-size: 26rpx;
+          color: rgba(255, 215, 0, 0.5);
+        }
+      }
+
+      // 记录列表
+      .records-list {
+        .record-item {
+          background: rgba(139, 69, 19, 0.3);
+          border: 2rpx solid rgba(255, 215, 0, 0.3);
+          border-radius: 15rpx;
+          padding: 25rpx;
+          margin-bottom: 20rpx;
+
+          .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20rpx;
+            padding-bottom: 15rpx;
+            border-bottom: 1rpx solid rgba(255, 215, 0, 0.2);
+
+            .record-rank {
+              font-size: 32rpx;
+              font-weight: bold;
+            }
+
+            .record-date {
+              font-size: 24rpx;
+              color: rgba(255, 215, 0, 0.6);
+            }
+          }
+
+          .record-details {
+            margin-bottom: 15rpx;
+
+            .record-row {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 10rpx;
+
+              .detail-label {
+                font-size: 26rpx;
+                color: rgba(255, 215, 0, 0.7);
+              }
+
+              .detail-value {
+                font-size: 28rpx;
+                font-weight: bold;
+                color: #ffd700;
+
+                &.positive {
+                  color: #90EE90;
+                }
+
+                &.negative {
+                  color: #ff6b6b;
+                }
+              }
+            }
+          }
+
+          .record-players {
+            padding-top: 15rpx;
+            border-top: 1rpx solid rgba(255, 215, 0, 0.2);
+
+            .players-label {
+              display: inline-block;
+              font-size: 24rpx;
+              color: rgba(255, 215, 0, 0.6);
+              margin-right: 10rpx;
+            }
+
+            .players-list {
+              display: inline;
+
+              .player-nickname {
+                display: inline-block;
+                font-size: 24rpx;
+                color: rgba(255, 215, 0, 0.8);
+                margin-right: 15rpx;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 设置区域
+    .settings-section {
+      background: rgba(255, 215, 0, 0.05);
+      border-radius: 20rpx;
+      padding: 30rpx;
+      margin-bottom: 30rpx;
+      border: 2rpx solid rgba(255, 215, 0, 0.2);
+
+      .section-title {
+        display: block;
+        font-size: 32rpx;
+        font-weight: bold;
+        color: #ffd700;
+        margin-bottom: 25rpx;
+        padding-bottom: 15rpx;
+        border-bottom: 2rpx solid rgba(255, 215, 0, 0.2);
+      }
+
+      .settings-list {
+        .setting-item {
+          display: flex !important;
+          justify-content: space-between !important;
+          align-items: center !important;
+          background: rgba(139, 69, 19, 0.3) !important;
+          border: 2rpx solid rgba(255, 215, 0, 0.3) !important;
+          border-radius: 12rpx !important;
+          padding: 25rpx !important;
+          margin-bottom: 15rpx;
+          width: 100%;
+          text-align: left;
+
+          &:active:not(.version) {
+            background: rgba(139, 69, 19, 0.5) !important;
+          }
+
+          &.version {
+            opacity: 0.8;
+            cursor: default;
+          }
+
+          .setting-label {
+            font-size: 28rpx;
+            color: #ffd700;
+          }
+
+          .setting-arrow {
+            font-size: 36rpx;
+            color: rgba(255, 215, 0, 0.5);
+          }
+
+          .setting-value {
+            font-size: 26rpx;
+            color: rgba(255, 215, 0, 0.6);
+          }
+        }
+      }
+    }
+  }
+}

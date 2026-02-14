@@ -1,0 +1,740 @@
+// 局域网房间页面样式
+.lan-room-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  // 全局防止文字竖排
+  * {
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+  }
+
+  &.loading-state {
+    justify-content: center;
+    align-items: center;
+
+    .loading-text {
+      font-size: 32px;
+      color: #ffd700;
+    }
+  }
+
+  // 头部
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 25px 30px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.15));
+    border-radius: 20px;
+    margin-bottom: 25px;
+    border: 2px solid rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+
+      .room-code {
+        font-size: 40px;
+        font-weight: bold;
+        color: #ffd700;
+        letter-spacing: 4px;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        font-family: 'Courier New', monospace;
+        white-space: nowrap;
+      }
+
+      taro-button-core.dismiss-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 20px;
+        height: 50px;
+        width: auto;
+        min-width: auto;
+        max-width: none;
+        margin: 0;
+        box-sizing: border-box;
+        
+        // 视觉样式（使用 !important）
+        background: rgba(220, 20, 60, 0.3) !important;
+        background-color: transparent !important;
+        color: #ff6b6b !important;
+        border: 2px solid rgba(220, 20, 60, 0.5) !important;
+        border-radius: 12px;
+        
+        // 文字样式
+        font-size: 24px;
+        font-weight: bold;
+        white-space: nowrap;
+        line-height: normal;
+        text-align: center;
+        
+        // 尺寸
+        flex-shrink: 0;
+        
+        // 重置
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        outline: none;
+        appearance: none;
+        transition: all 0.3s ease;
+        
+        &::after {
+          display: none;
+        }
+
+        &[disabled] {
+          opacity: 0.5;
+        }
+
+        &:active:not([disabled]) {
+          background: rgba(220, 20, 60, 0.5) !important;
+          transform: translateY(2px);
+        }
+      }
+    }
+
+    .header-bottom {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      .lan-badge {
+        padding: 10px 18px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        font-size: 24px;
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      taro-button-core.qr-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 28px;
+        height: 60px;
+        width: auto;
+        min-width: auto;
+        max-width: none;
+        margin: 0;
+        box-sizing: border-box;
+        
+        // 视觉样式（使用 !important）
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+        background-color: transparent !important;
+        color: #fff !important;
+        border: none !important;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
+        
+        // 文字样式
+        font-size: 24px;
+        font-weight: bold;
+        white-space: nowrap;
+        line-height: normal;
+        text-align: center;
+        
+        // 尺寸
+        flex-shrink: 0;
+        
+        // 重置
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        outline: none;
+        appearance: none;
+        transition: all 0.3s ease;
+        
+        &::after {
+          display: none;
+        }
+
+        &:active {
+          transform: translateY(2px);
+          box-shadow: 0 2px 8px rgba(240, 147, 251, 0.4);
+        }
+      }
+    }
+  }
+
+  // 玩家列表区域
+  .players-section {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .section-title {
+      font-size: 32px;
+      color: #ffd700;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    }
+
+    .players-list {
+      flex: 1;
+      overflow-y: auto;
+
+      .player-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 215, 0, 0.2);
+        border-radius: 16px;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+
+        &.empty {
+          border-style: dashed;
+          opacity: 0.5;
+
+          .player-avatar {
+            background: rgba(255, 255, 255, 0.05);
+          }
+        }
+
+        .player-info {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          flex: 1;
+
+          .player-avatar {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #ffd700;
+            flex-shrink: 0;
+
+            .avatar-placeholder {
+              width: 100%;
+              height: 100%;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 36px;
+              font-weight: bold;
+              color: #fff;
+            }
+
+            &.empty-avatar {
+              border-style: dashed;
+              border-color: rgba(255, 215, 0, 0.3);
+              background: transparent;
+
+              .empty-text {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                color: #808080;
+              }
+            }
+
+            .host-badge {
+              position: absolute;
+              bottom: -5px;
+              left: 50%;
+              transform: translateX(-50%);
+              background: linear-gradient(135deg, #ffd700, #ffed4e);
+              color: #1a0a00;
+              font-size: 18px;
+              font-weight: bold;
+              padding: 4px 12px;
+              border-radius: 10px;
+              box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+              white-space: nowrap;
+            }
+          }
+
+          .player-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .player-nickname {
+              font-size: 28px;
+              color: #fff;
+              font-weight: bold;
+            }
+
+            .player-index {
+              font-size: 22px;
+              color: #a0a0b0;
+            }
+          }
+        }
+
+        .ready-status {
+          padding: 10px 20px;
+          background: rgba(255, 255, 255, 0.1);
+          color: #a0a0b0;
+          border-radius: 12px;
+          font-size: 24px;
+          font-weight: bold;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+
+          &.ready {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border-color: rgba(76, 175, 80, 0.5);
+          }
+        }
+      }
+    }
+  }
+
+  // 游戏设置区域
+  .settings-section {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
+
+    .section-title {
+      font-size: 32px;
+      color: #ffd700;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    }
+
+    .settings-content {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+
+      .setting-item {
+        .setting-label {
+          display: block;
+          font-size: 28px;
+          color: #e0e0e0;
+          margin-bottom: 15px;
+          font-weight: bold;
+        }
+
+        .weather-switch {
+          display: flex;
+          gap: 15px;
+
+          taro-button-core.weather-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 20px;
+            margin: 0;
+            box-sizing: border-box;
+            min-height: 100px;
+            
+            // 视觉样式（使用 !important）
+            background: rgba(255, 255, 255, 0.05) !important;
+            background-color: transparent !important;
+            border: 2px solid rgba(255, 215, 0, 0.3) !important;
+            border-radius: 16px;
+            
+            // 重置
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            appearance: none;
+            transition: all 0.3s ease;
+            line-height: normal;
+            
+            &::after {
+              display: none;
+            }
+
+            &.active {
+              background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.2)) !important;
+              border-color: #667eea !important;
+              box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+            }
+
+            &[disabled] {
+              opacity: 0.5;
+            }
+
+            &:active:not([disabled]) {
+              transform: scale(0.98);
+            }
+
+            taro-view-core.weather-btn-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 10px;
+
+              taro-text-core.weather-name {
+                font-size: 28px;
+                color: #ffd700;
+                font-weight: bold;
+                white-space: nowrap;
+                display: block;
+              }
+
+              taro-text-core.weather-desc {
+                font-size: 22px;
+                color: #a0a0b0;
+                white-space: nowrap;
+                display: block;
+              }
+            }
+          }
+        }
+
+        .legendary-display {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          align-items: center;
+          justify-content: flex-start;
+
+          .legendary-hint {
+            font-size: 24px;
+            color: #808080;
+            font-style: italic;
+          }
+
+          .legendary-tag {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.15));
+            color: #ffd700;
+            border: 2px solid rgba(102, 126, 234, 0.4);
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: bold;
+            white-space: nowrap;
+          }
+
+          taro-button-core.select-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 32px;
+            height: 56px;
+            width: auto;
+            min-width: 100px;
+            max-width: 160px;
+            margin: 0;
+            margin-left: auto;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            flex-grow: 0;
+            
+            // 视觉样式（使用 !important）
+            background: rgba(255, 215, 0, 0.2) !important;
+            background-color: transparent !important;
+            color: #ffd700 !important;
+            border: 2px solid rgba(255, 215, 0, 0.4) !important;
+            border-radius: 12px;
+            
+            // 文字样式
+            font-size: 28px;
+            font-weight: bold;
+            white-space: nowrap;
+            line-height: normal;
+            text-align: center;
+            
+            // 重置
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            appearance: none;
+            transition: all 0.3s ease;
+            
+            &::after {
+              display: none;
+            }
+
+            &[disabled] {
+              opacity: 0.5;
+            }
+
+            &:active:not([disabled]) {
+              background: rgba(255, 215, 0, 0.3) !important;
+              transform: translateY(2px);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 底部操作区域
+  .footer {
+    padding: 20px 0 10px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    // 局域网专用准备按钮（View组件）
+    // 使用 taro-view-core 确保选择器正确匹配编译后的元素
+    taro-view-core.lan-custom-ready-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      min-width: 300px;
+      max-width: 420px;
+      height: 70px;
+      padding: 0 50px;
+      margin: 0;
+      box-sizing: border-box;
+      
+      // 未准备：蓝色渐变
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(79, 172, 254, 0.5);
+      
+      font-size: 32px;
+      font-weight: bold;
+      white-space: nowrap;
+      text-align: center;
+      
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.3s ease;
+      
+      &:active {
+        transform: translateY(2px);
+        box-shadow: 0 4px 20px rgba(79, 172, 254, 0.5);
+      }
+
+      // 已准备：绿色渐变
+      &.ready {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%) !important;
+        box-shadow: 0 8px 32px rgba(86, 171, 47, 0.6) !important;
+        
+        &:active {
+          box-shadow: 0 4px 20px rgba(86, 171, 47, 0.6) !important;
+        }
+      }
+    }
+
+    // 局域网专用开始按钮（View组件）
+    // 使用 taro-view-core 确保选择器正确匹配编译后的元素
+    taro-view-core.lan-custom-start-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      min-width: 300px;
+      max-width: 420px;
+      height: 70px;
+      padding: 0 50px;
+      margin: 0;
+      box-sizing: border-box;
+      
+      // 正常状态：紫色渐变
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.6);
+      
+      font-size: 32px;
+      font-weight: bold;
+      white-space: nowrap;
+      text-align: center;
+      
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.3s ease;
+      
+      &:active {
+        transform: translateY(2px);
+        box-shadow: 0 6px 24px rgba(102, 126, 234, 0.6);
+      }
+
+      // disabled状态
+      &.disabled {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: rgba(255, 255, 255, 0.3) !important;
+        box-shadow: none !important;
+        opacity: 0.5;
+        cursor: not-allowed;
+        
+        &:active {
+          transform: none;
+        }
+      }
+    }
+  }
+
+  // 弹窗样式
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+
+    .modal-content {
+      background: linear-gradient(180deg, #2a1a50 0%, #1a0a30 100%);
+      border: 3px solid rgba(255, 215, 0, 0.5);
+      border-radius: 24px;
+      width: 90vw;
+      max-width: 800px;
+      max-height: 85vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+      .modal-header {
+        padding: 30px;
+        background: rgba(255, 215, 0, 0.1);
+        border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+        text-align: center;
+
+        .modal-title {
+          display: block;
+          font-size: 36px;
+          color: #ffd700;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+
+        .modal-subtitle {
+          display: block;
+          font-size: 22px;
+          color: #a0a0b0;
+        }
+      }
+
+      .modal-body {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+      }
+
+      .modal-footer {
+        padding: 20px 30px;
+        background: rgba(0, 0, 0, 0.2);
+        border-top: 2px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: center;
+
+        .close-btn {
+          padding: 15px 50px;
+          background: rgba(255, 255, 255, 0.1);
+          color: #e0e0e0;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-radius: 16px;
+          font-size: 28px;
+          font-weight: bold;
+
+          &:active {
+            background: rgba(255, 255, 255, 0.15);
+          }
+        }
+      }
+    }
+  }
+}
+
+// 二维码弹窗特殊样式
+@import './qr-modal.scss';
+
+// 传奇建筑选择弹窗
+.modal-content {
+  .building-group {
+    margin-bottom: 30px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .group-title {
+      grid-column: 1 / -1;
+      font-size: 28px;
+      color: #ffd700;
+      font-weight: bold;
+      margin-bottom: 5px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .building-item {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 215, 0, 0.2);
+      border-radius: 12px;
+      transition: all 0.3s;
+
+      &.active {
+        background: rgba(102, 126, 234, 0.2);
+        border-color: #667eea;
+        box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+      }
+
+      &.disabled {
+        opacity: 0.7;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      &:not(.disabled):active {
+        transform: scale(0.98);
+      }
+
+      .building-name {
+        display: block;
+        font-size: 26px;
+        color: #ffd700;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .building-desc {
+        display: block;
+        font-size: 22px;
+        color: #a0a0b0;
+        line-height: 1.4;
+      }
+    }
+  }
+}

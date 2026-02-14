@@ -1,0 +1,178 @@
+// 二维码弹窗样式
+.qr-modal {
+  width: 90vw;
+  max-width: 700px;
+  max-height: 85vh;
+
+  .qr-modal-body {
+    padding: 30px;
+    max-height: 60vh;
+    overflow-y: auto;
+
+    .room-info-card {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      border: 2px solid rgba(255, 215, 0, 0.4);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 30px;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &.highlight {
+          background: rgba(255, 215, 0, 0.1);
+          border-radius: 12px;
+          padding: 20px 15px;
+          margin: -10px -10px 10px -10px;
+        }
+
+        .info-label {
+          font-size: 24px;
+          color: #a0a0b0;
+        }
+
+        .info-value {
+          font-size: 32px;
+          color: #ffd700;
+          font-weight: bold;
+          font-family: 'Courier New', monospace;
+        }
+
+        &.highlight .info-value {
+          font-size: 40px;
+          letter-spacing: 4px;
+        }
+      }
+    }
+
+    .qr-container {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      border: 3px solid rgba(255, 215, 0, 0.3);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+
+      .qr-image {
+        width: 300px;
+        height: 300px;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .qr-loading {
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px dashed rgba(255, 215, 0, 0.3);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #a0a0b0;
+      }
+
+      .qr-text {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        width: 100%;
+
+        .qr-instruction {
+          font-size: 30px;
+          color: #ffd700;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+
+        .qr-hint {
+          font-size: 24px;
+          color: #a0a0b0;
+        }
+
+        .qr-url {
+          font-size: 26px;
+          color: #667eea;
+          font-weight: bold;
+          font-family: 'Courier New', monospace;
+          background: rgba(102, 126, 234, 0.1);
+          padding: 12px 20px;
+          border-radius: 8px;
+          word-break: break-all;
+        }
+
+        .qr-hint-small {
+          font-size: 20px;
+          color: #808080;
+          margin-top: 5px;
+          line-height: 1.5;
+
+          .code-highlight {
+            color: #f093fb;
+            font-weight: bold;
+            font-size: 24px;
+            padding: 0 6px;
+            background: rgba(240, 147, 251, 0.15);
+            border-radius: 4px;
+          }
+        }
+      }
+    }
+
+    .join-instructions {
+      background: rgba(255, 215, 0, 0.05);
+      border: 2px solid rgba(255, 215, 0, 0.2);
+      border-radius: 16px;
+      padding: 25px;
+
+      .instruction-title {
+        font-size: 28px;
+        color: #ffd700;
+        font-weight: bold;
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      .instruction-item {
+        font-size: 24px;
+        color: #e0e0e0;
+        line-height: 2;
+        display: block;
+        padding-left: 10px;
+        position: relative;
+
+        &::before {
+          content: '▸';
+          position: absolute;
+          left: -5px;
+          color: #667eea;
+        }
+
+        .highlight-code {
+          color: #f093fb;
+          font-weight: bold;
+          font-size: 28px;
+          padding: 0 8px;
+          background: rgba(240, 147, 251, 0.15);
+          border-radius: 6px;
+        }
+      }
+    }
+  }
+}

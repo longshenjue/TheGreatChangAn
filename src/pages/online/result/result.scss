@@ -1,0 +1,209 @@
+// 游戏结果页面样式
+.result-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #2a1200 0%, #1a0a00 100%);
+  padding: 20rpx;
+  box-sizing: border-box;
+
+  &.loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .loading-text {
+      font-size: 32rpx;
+      color: #ffd700;
+    }
+  }
+
+  // 头部
+  .result-header {
+    text-align: center;
+    padding: 40rpx 20rpx;
+    margin-bottom: 30rpx;
+
+    .result-title {
+      display: block;
+      font-size: 48rpx;
+      font-weight: bold;
+      color: #ffd700;
+      text-shadow: 0 0 20rpx rgba(255, 215, 0, 0.6);
+      margin-bottom: 15rpx;
+    }
+
+    .result-subtitle {
+      display: block;
+      font-size: 28rpx;
+      color: rgba(255, 215, 0, 0.7);
+    }
+  }
+
+  // 排名列表
+  .rankings-list {
+    margin-bottom: 30rpx;
+
+    .rank-item {
+      background: rgba(139, 69, 19, 0.3);
+      border-radius: 20rpx;
+      padding: 30rpx;
+      margin-bottom: 20rpx;
+      border: 3rpx solid;
+      position: relative;
+      overflow: hidden;
+
+      &.me {
+        background: rgba(0, 255, 0, 0.1);
+        box-shadow: 0 0 20rpx rgba(0, 255, 0, 0.3);
+      }
+
+      &.rank-1 {
+        .rank-badge {
+          animation: shine 2s infinite;
+        }
+      }
+
+      // 排名标识
+      .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10rpx;
+        padding: 10rpx 25rpx;
+        border-radius: 25rpx;
+        margin-bottom: 20rpx;
+        color: #ffffff;
+        font-weight: bold;
+
+        .rank-emoji {
+          font-size: 32rpx;
+        }
+
+        .rank-number {
+          font-size: 28rpx;
+        }
+      }
+
+      // 玩家信息
+      .player-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20rpx;
+
+        .player-avatar {
+          width: 80rpx;
+          height: 80rpx;
+          border-radius: 50%;
+          border: 3rpx solid rgba(255, 215, 0, 0.5);
+          margin-right: 20rpx;
+        }
+
+        .player-details {
+          flex: 1;
+
+          .player-nickname {
+            font-size: 32rpx;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 10rpx;
+
+            .me-tag {
+              color: #90EE90;
+              font-size: 24rpx;
+            }
+          }
+
+          .player-stats {
+            display: flex;
+            gap: 20rpx;
+
+            .stat-item {
+              font-size: 24rpx;
+              color: rgba(255, 215, 0, 0.7);
+            }
+          }
+        }
+      }
+
+      // 总资产
+      .assets-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15rpx 20rpx;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12rpx;
+        margin-bottom: 15rpx;
+
+        .assets-label {
+          font-size: 26rpx;
+          color: rgba(255, 215, 0, 0.7);
+        }
+
+        .assets-value {
+          font-size: 36rpx;
+          font-weight: bold;
+          color: #ffd700;
+        }
+      }
+
+      // 积分变化
+      .score-change-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15rpx 20rpx;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12rpx;
+
+        .score-label {
+          font-size: 26rpx;
+          color: rgba(255, 215, 0, 0.7);
+        }
+
+        .score-value {
+          font-size: 36rpx;
+          font-weight: bold;
+
+          &.positive {
+            color: #90EE90;
+          }
+
+          &.negative {
+            color: #ff6b6b;
+          }
+        }
+      }
+    }
+  }
+
+  // 底部按钮
+  .result-footer {
+    padding: 20rpx 0;
+
+    .lobby-btn {
+      width: 100%;
+      padding: 35rpx;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      color: #8b4513;
+      border: none;
+      border-radius: 20rpx;
+      font-size: 36rpx;
+      font-weight: bold;
+      box-shadow: 0 8rpx 16rpx rgba(255, 215, 0, 0.3);
+
+      &:active {
+        transform: translateY(2rpx);
+        box-shadow: 0 4rpx 8rpx rgba(255, 215, 0, 0.3);
+      }
+    }
+  }
+}
+
+// 发光动画
+@keyframes shine {
+  0%, 100% {
+    box-shadow: 0 0 10rpx rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30rpx rgba(255, 215, 0, 0.8);
+  }
+}

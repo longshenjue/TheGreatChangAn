@@ -1,0 +1,487 @@
+// 在线大厅 - 唐风主题
+
+.lobby-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  // 全局防止文字竖排
+  * {
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+  }
+
+  // 重置所有 Taro 组件的默认样式
+  taro-button-core,
+  taro-input-core,
+  taro-text-core,
+  taro-view-core {
+    &::after {
+      display: none;
+      border: none;
+    }
+  }
+
+  // ========== 顶部导航 ==========
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+
+    .title {
+      font-size: 42px;
+      font-weight: bold;
+      color: #ffd700;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+      letter-spacing: 3px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      flex-shrink: 0;
+
+      taro-button-core.refresh-btn,
+      taro-button-core.back-btn {
+        // 基础显示
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        
+        // 尺寸
+        padding: 0 30px;
+        height: 50px;
+        margin: 0;
+        
+        // 边框和圆角
+        border-radius: 12px;
+        
+        // 文字样式
+        font-size: 24px;
+        font-weight: bold;
+        white-space: nowrap;
+        line-height: normal;
+        text-align: center;
+        
+        // 重置
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        transition: all 0.3s ease;
+        
+        &::after {
+          display: none;
+        }
+      }
+
+      taro-button-core.refresh-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background-color: transparent !important;
+        border: none !important;
+        color: #fff !important;
+
+        &[disabled] {
+          background: rgba(255, 255, 255, 0.1) !important;
+          color: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        &:active:not([disabled]) {
+          transform: translateY(2px);
+        }
+      }
+
+      taro-button-core.back-btn {
+        background: rgba(255, 255, 255, 0.1) !important;
+        background-color: transparent !important;
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        color: #e0e0e0 !important;
+
+        &[disabled] {
+          opacity: 0.5;
+        }
+
+        &:active:not([disabled]) {
+          background: rgba(255, 255, 255, 0.15) !important;
+        }
+      }
+    }
+  }
+
+  // ========== 操作区 ==========
+  .actions {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
+
+    .room-actions {
+      display: flex;
+      gap: 15px;
+      align-items: stretch;
+      flex-wrap: nowrap;
+
+      // 重置创建和加入按钮（不要影响其他按钮）
+      taro-button-core.create-room-btn,
+      taro-button-core.join-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        border-radius: 16px;
+        font-size: 28px;
+        font-weight: bold;
+        white-space: nowrap;
+        border: none;
+        line-height: normal;
+        
+        &::after {
+          display: none;
+          border: none;
+        }
+      }
+
+      // 创建房间按钮
+      taro-button-core.create-room-btn {
+        flex: 0 0 auto;
+        width: 160px;
+        max-width: 160px;
+        min-width: 160px;
+        height: 70px;
+        padding: 0 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+
+        &[disabled] {
+          background: rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.3);
+          box-shadow: none;
+        }
+
+        &:active:not([disabled]) {
+          transform: translateY(2px);
+          box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+        }
+      }
+
+      // 输入框
+      taro-input-core.room-code-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: none;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 215, 0, 0.4);
+        border-radius: 16px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+
+        input,
+        .weui-input {
+          background: transparent;
+          border: none;
+          padding: 22px 25px;
+          font-size: 28px;
+          color: #fff;
+          text-align: center;
+          font-weight: bold;
+          letter-spacing: 3px;
+          width: 100%;
+          box-sizing: border-box;
+
+          &::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: normal;
+          }
+        }
+      }
+
+      // 加入按钮
+      taro-button-core.join-btn {
+        flex: 0 0 auto;
+        width: 160px;
+        max-width: 160px;
+        min-width: 160px;
+        height: 70px;
+        padding: 0 30px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(240, 147, 251, 0.4);
+
+        &[disabled] {
+          background: rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.3);
+          box-shadow: none;
+        }
+
+        &:active:not([disabled]) {
+          transform: translateY(2px);
+          box-shadow: 0 2px 10px rgba(240, 147, 251, 0.4);
+        }
+      }
+    }
+  }
+
+  // ========== 房间列表 ==========
+  .room-list-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 215, 0, 0.2);
+    border-radius: 20px;
+    padding: 25px 25px 15px 25px;
+    overflow: hidden;
+
+    .list-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 20px;
+
+      .list-title {
+        font-size: 32px;
+        font-weight: bold;
+        color: #ffd700;
+      }
+
+      .list-count {
+        font-size: 26px;
+        color: #a0a0b0;
+      }
+    }
+
+    .room-list {
+      flex: 1;
+      overflow-y: auto;
+      padding-top: 10px;
+
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 40px;
+        text-align: center;
+
+        .empty-text {
+          font-size: 30px;
+          color: #808080;
+          margin-bottom: 15px;
+        }
+
+        .empty-hint {
+          font-size: 24px;
+          color: #606060;
+        }
+      }
+
+      taro-view-core.room-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        border-radius: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        gap: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        box-sizing: border-box;
+
+        &:hover {
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+          border-color: rgba(255, 215, 0, 0.5);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        &:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        taro-view-core.room-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          min-width: 0;
+
+          taro-view-core.room-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+
+            taro-text-core.room-code {
+              font-size: 40px;
+              color: #ffd700;
+              font-weight: bold;
+              letter-spacing: 4px;
+              font-family: 'Courier New', monospace;
+              text-shadow: 0 0 15px rgba(255, 215, 0, 0.6),
+                           0 0 30px rgba(255, 215, 0, 0.3);
+            }
+
+            taro-view-core.room-status {
+              padding: 10px 20px;
+              background: linear-gradient(135deg, rgba(76, 175, 80, 0.25) 0%, rgba(76, 175, 80, 0.15) 100%);
+              border: 2px solid rgba(76, 175, 80, 0.6);
+              border-radius: 15px;
+              flex-shrink: 0;
+              box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+
+              taro-text-core.status-text {
+                font-size: 24px;
+                color: #4caf50;
+                font-weight: bold;
+                white-space: nowrap;
+                text-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+              }
+            }
+          }
+
+          taro-view-core.room-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            taro-text-core.room-host,
+            taro-text-core.room-players {
+              font-size: 28px;
+              color: #e0e0e0;
+              line-height: 1.8;
+              white-space: nowrap;
+              display: block;
+            }
+          }
+
+          taro-view-core.room-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            taro-text-core.setting-item {
+              font-size: 28px;
+              color: #e0e0e0;
+              line-height: 1.8;
+              white-space: nowrap;
+              display: block;
+            }
+          }
+        }
+
+        taro-button-core[class*="join-room-btn"] {
+          // 基础显示和定位
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+          
+          // 尺寸
+          width: 140px;
+          max-width: 140px;
+          min-width: 140px;
+          height: 80px;
+          padding: 0 35px;
+          margin: 0;
+          box-sizing: border-box;
+          flex-shrink: 0;
+          align-self: center;
+          
+          // 背景和边框
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+          background-color: transparent !important;
+          border: 3px solid rgba(255, 215, 0, 0.4) !important;
+          border-radius: 20px;
+          
+          // 文字样式
+          color: #fff !important;
+          font-size: 32px;
+          font-weight: bold;
+          line-height: normal;
+          white-space: nowrap;
+          text-align: center;
+          
+          // 阴影和动画
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5), 
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          transition: all 0.3s ease;
+          
+          // 重置可能影响的属性
+          cursor: pointer;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+          outline: none;
+          appearance: none;
+          -webkit-appearance: none;
+
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+          }
+
+          &:hover::before {
+            left: 100%;
+          }
+
+          &::after {
+            display: none;
+            border: none;
+          }
+
+          &:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 215, 0, 0.6);
+          }
+
+          &[disabled] {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.4);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+
+            &:hover {
+              transform: none;
+              box-shadow: none;
+            }
+
+            &::before {
+              display: none;
+            }
+          }
+
+          &:active:not([disabled]) {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+          }
+        }
+      }
+    }
+  }
+}
