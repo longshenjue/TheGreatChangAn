@@ -14,8 +14,33 @@ echo "📂 工作目录: $(pwd)"
 echo ""
 
 # 1. 检查并构建前端（如果需要）
+NEED_BUILD=false
+
 if [ ! -d "dist" ]; then
-  echo "📦 未找到构建产物，开始构建前端..."
+  echo "📦 未找到构建产物，需要构建"
+  NEED_BUILD=true
+elif [ "${FORCE_REBUILD}" = "true" ]; then
+  echo "🔄 检测到 FORCE_REBUILD=true，强制重新构建"
+  rm -rf dist
+  NEED_BUILD=true
+else
+  echo "✅ 找到构建产物"
+  # 检查环境变量是否变化（可选：通过标记文件判断）
+  if [ -f ".build_config" ]; then
+    OLD_CONFIG=$(cat .build_config)
+    NEW_CONFIG="${PUBLIC_HOST}:${PUBLIC_PROTOCOL}"
+    if [ "$OLD_CONFIG" != "$NEW_CONFIG" ]; then
+      echo "🔄 检测到后端配置变化，需要重新构建"
+      echo "   旧配置: $OLD_CONFIG"
+      echo "   新配置: $NEW_CONFIG"
+      rm -rf dist
+      NEED_BUILD=true
+    fi
+  fi
+fi
+
+if [ "$NEED_BUILD" = true ]; then
+  echo "🔨 开始构建前端..."
   echo "   这可能需要 1-2 分钟，请耐心等待..."
   
   # 构建前注入环境变量
@@ -27,6 +52,8 @@ if [ ! -d "dist" ]; then
   fi
   export BACKEND_PROTOCOL="${PUBLIC_PROTOCOL:-wss}"
   
+  echo "   后端配置: $BACKEND_HOST ($BACKEND_PROTOCOL:$BACKEND_PORT)"
+  
   npm run build:h5
   
   if [ ! -d "dist" ]; then
@@ -34,12 +61,15 @@ if [ ! -d "dist" ]; then
     exit 1
   fi
   
+  # 保存构建配置标记
+  echo "${PUBLIC_HOST}:${PUBLIC_PROTOCOL}" > .build_config
+  
   echo "✅ 构建完成！"
-  echo ""
 else
-  echo "✅ 找到构建产物，跳过构建步骤"
-  echo ""
+  echo "⏭️  跳过构建步骤"
 fi
+
+echo ""
 
 # 2. 显示环境配置
 echo "📝 环境配置："
