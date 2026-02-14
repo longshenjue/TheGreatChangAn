@@ -49,6 +49,7 @@ Thumbs.db
 
 # Taro specific
 .taro/
+.swc/
 
 # WeChat Mini Program
 project.config.json
