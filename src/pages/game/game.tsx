@@ -79,7 +79,7 @@ export default function Game() {
   const [showBuildingShop, setShowBuildingShop] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<string | null>(null);
   const [buildingDetailModal, setBuildingDetailModal] = useState<BuildingConfig | null>(null); // 建筑详情弹窗
-  const [purchaseAnimation, setPurchaseAnimation] = useState<{ show: boolean; buildingName: string }>({ show: false, buildingName: '' }); // 购买动画
+  const [purchaseAnimation, setPurchaseAnimation] = useState<{ show: boolean; buildingName: string; isLegendary: boolean }>({ show: false, buildingName: '', isLegendary: false }); // 购买动画
   const [canFlipDice, setCanFlipDice] = useState(false);
   const [hasPurchased, setHasPurchased] = useState(false);
   const [showSettlementModal, setShowSettlementModal] = useState(false);
@@ -142,13 +142,17 @@ export default function Game() {
       case 'purchaseBuilding':
         // 显示购买结果
         if (result.purchased && result.building) {
+          const isLegendary = result.building.level === 'legendary';
           setPurchaseAnimation({
             show: true,
-            buildingName: result.building.name
+            buildingName: result.building.name,
+            isLegendary
           });
+          // 传奇建筑动画持续更久
+          const animationDuration = isLegendary ? 5000 : 2000;
           setTimeout(() => {
-            setPurchaseAnimation({ show: false, buildingName: '' });
-          }, 2000);
+            setPurchaseAnimation({ show: false, buildingName: '', isLegendary: false });
+          }, animationDuration);
           
           setHasPurchased(true);
           setShowBuildingShop(false);
@@ -156,12 +160,29 @@ export default function Game() {
           // 检查游戏结束
           if (result.gameOver && result.winner) {
             setTimeout(() => {
+              const winMessage = result.winType === 'instant' 
+                ? `🎉 ${result.winner.name} 建造【九鼎神庙】，立即获胜！`
+                : result.winType === 'wanguolaizhao'
+                ? `🎉 ${result.winner.name} 拥有【万国来朝】，总资产达到 ${result.totalAssets} 金，获胜！`
+                : `🎉 恭喜 ${result.winner.name} 获得胜利！`;
+              
               Taro.showModal({
                 title: '游戏结束',
-                content: `🎉 恭喜 ${result.winner.name} 获得胜利！`,
-                showCancel: false,
-                success: () => {
-                  Taro.redirectTo({ url: '/pages/welcome/welcome' });
+                content: winMessage,
+                confirmText: '返回房间',
+                cancelText: '回到首页',
+                success: (res) => {
+                  if (res.confirm) {
+                    // 返回房间，准备下一局
+                    if (isLANMode && roomId) {
+                      Taro.redirectTo({ url: `/pages/lan/room/room?roomId=${roomId}` });
+                    } else {
+                      Taro.redirectTo({ url: '/pages/welcome/welcome' });
+                    }
+                  } else {
+                    // 回到首页
+                    Taro.redirectTo({ url: '/pages/welcome/welcome' });
+                  }
                 },
               });
             }, 2000);
@@ -373,14 +394,38 @@ export default function Game() {
     const winCheck = checkWinCondition(gameState);
     if (winCheck.hasWinner && winCheck.winner) {
       setTimeout(() => {
+        const winMessage = `🎉 恭喜 ${winCheck.winner?.name} 获得胜利！`;
+        
         Taro.showModal({
           title: '游戏结束',
-          content: `🎉 恭喜 ${winCheck.winner?.name} 获得胜利！`,
-          showCancel: false,
-          success: () => {
-            Taro.redirectTo({
-              url: '/pages/index/index'
-            });
+          content: winMessage,
+          confirmText: '再来一局',
+          cancelText: '返回大厅',
+          success: (res) => {
+            if (res.confirm) {
+              // 再来一局：重新初始化游戏
+              const playerNames = router.params.players ? JSON.parse(decodeURIComponent(router.params.players as string)) : [];
+              const weatherMode = router.params.weather as WeatherMode || 'prosperity';
+              const legendaryBuildings = router.params.legendary ? JSON.parse(decodeURIComponent(router.params.legendary as string)) : [];
+              
+              const newGameState = initializeGame(playerNames, weatherMode, legendaryBuildings);
+              setGameState(newGameState);
+              setDiceResult(null);
+              setSettlementResults([]);
+              setCanFlipDice(false);
+              setHasPurchased(false);
+              
+              Taro.showToast({
+                title: '新游戏开始！',
+                icon: 'success',
+                duration: 2000
+              });
+            } else {
+              // 返回大厅
+              Taro.redirectTo({
+                url: '/pages/index/index'
+              });
+            }
           },
         });
       }, 500);
@@ -443,10 +488,13 @@ export default function Game() {
       
       if (result.success) {
         // 显示购买成功动画
-        setPurchaseAnimation({ show: true, buildingName: config?.name || '' });
+        const isLegendary = config?.level === 'legendary';
+        setPurchaseAnimation({ show: true, buildingName: config?.name || '', isLegendary });
+        // 传奇建筑动画持续更久
+        const animationDuration = isLegendary ? 5000 : 2000;
         setTimeout(() => {
-          setPurchaseAnimation({ show: false, buildingName: '' });
-        }, 2000);
+          setPurchaseAnimation({ show: false, buildingName: '', isLegendary: false });
+        }, animationDuration);
         
         const hadExtraBuyChance = currentPlayer.canBuyExtra;
         
@@ -586,8 +634,8 @@ export default function Game() {
               </View>
               <View className="player-resources">
                 <Text className="gold">💰 {player.gold}</Text>
-                {player.taxReductionCards > 0 && (
-                  <Text className="tax-card">🎫 x{player.taxReductionCards}</Text>
+                {(player.upgradeCards || 0) > 0 && (
+                  <Text className="upgrade-card">🎫 {player.upgradeCards}</Text>
                 )}
               </View>
             </View>
@@ -755,19 +803,19 @@ export default function Game() {
                   expenses: typeof settlementResults,
                   special: typeof settlementResults,
                   totalGold: number,
-                  totalTaxCards: number
+                  totalUpgradeCards: number
                 } } = {};
 
                 // 初始化所有玩家的分组
                 gameState.players.forEach(player => {
-                  playerGroups[player.id] = {
-                    player,
-                    incomeBuildings: {}, // 自己建筑的收益（可合并）
-                    expenses: [],        // 支付给他人的损失（不合并）
-                    special: [],         // 特殊效果
-                    totalGold: 0,
-                    totalTaxCards: 0     // 减税卡总数
-                  };
+                playerGroups[player.id] = {
+                  player,
+                  incomeBuildings: {}, // 自己建筑的收益（可合并）
+                  expenses: [],        // 支付给他人的损失（不合并）
+                  special: [],         // 特殊效果
+                  totalGold: 0,
+                  totalUpgradeCards: 0     // 升级卡总数
+                };
                 });
 
                 // 传奇建筑名称列表
@@ -780,10 +828,10 @@ export default function Game() {
 
                   group.totalGold += result.goldChange;
                   
-                  // 提取减税卡数量
-                  const taxCardMatch = result.description.match(/获得\s*(\d+)\s*张减税卡/);
-                  if (taxCardMatch) {
-                    group.totalTaxCards += parseInt(taxCardMatch[1]);
+                  // 提取升级卡数量
+                  const upgradeCardMatch = result.description.match(/获得\s*(\d+)\s*张升级卡/);
+                  if (upgradeCardMatch) {
+                    group.totalUpgradeCards += parseInt(upgradeCardMatch[1]);
                   }
                   
                   // 检查是否包含传奇建筑效果
@@ -863,9 +911,9 @@ export default function Game() {
                               <Text className={group.totalGold >= 0 ? 'positive' : 'negative'}>
                                 {group.totalGold >= 0 ? `+${group.totalGold}` : group.totalGold} 金
                               </Text>
-                              {group.totalTaxCards > 0 && (
+                              {group.totalUpgradeCards > 0 && (
                                 <Text className="tax-card-text">
-                                  ，📜 +{group.totalTaxCards} 张减税卡
+                                  ，🎫 +{group.totalUpgradeCards} 张升级卡
                                 </Text>
                               )}
                             </Text>
@@ -931,7 +979,7 @@ export default function Game() {
             </View>
             <View className="shop-info-bar">
               <Text className="info-text">💰 当前金币: {currentPlayer.gold}</Text>
-              <Text className="info-text">📜 减税卡: {currentPlayer.taxReductionCards}</Text>
+              <Text className="info-text">🎫 升级卡: {currentPlayer.upgradeCards || 0}</Text>
             </View>
             <ScrollView scrollY className="shop-content">
             {Object.keys(gameState.availableBuildings)
@@ -962,11 +1010,23 @@ export default function Game() {
                   triggerText = '传奇建筑';
                 }
 
-                // 计算实际费用（考虑减税卡和祭天坛免费购买）
+                // 计算实际费用和资源需求
                 const isLegendary = config.level === 'legendary';
+                const isAdvanced = config.level === 'advanced';
                 const isFree = currentPlayer.canFreeBuilding && !isLegendary;
-                const actualCost = isFree ? 0 : Math.max(0, config.cost - currentPlayer.taxReductionCards);
-                const canAfford = currentPlayer.gold >= actualCost || isFree;
+                const isDirectBuy = currentPlayer.canDirectBuyAdvanced && isAdvanced;
+                const actualCost = isFree || isDirectBuy ? 0 : config.cost;
+                
+                // 检查升级卡（高级建筑需要升级卡，除非是祭天坛直接购买）
+                const needsUpgradeCards = isAdvanced && config.requiresUpgrade && !isDirectBuy;
+                const requiredUpgradeCards = needsUpgradeCards ? (config.requiresUpgradeCards || 3) : 0;
+                const hasEnoughUpgradeCards = !needsUpgradeCards || (currentPlayer.upgradeCards || 0) >= requiredUpgradeCards;
+                
+                // 检查是否拥有中级建筑（升级要求）
+                const needsSourceBuilding = isAdvanced && config.requiresUpgrade && config.upgradeFrom && !isDirectBuy;
+                const hasSourceBuilding = !needsSourceBuilding || currentPlayer.buildings.some(b => b.configId === config.upgradeFrom);
+                
+                const canAfford = (currentPlayer.gold >= actualCost || isFree || isDirectBuy) && hasEnoughUpgradeCards && hasSourceBuilding;
 
                 return (
                   <View 
@@ -987,6 +1047,11 @@ export default function Game() {
                           } : {}}
                         >
                           {config.name}
+                          {config.requiresUpgrade && config.upgradeFrom && (
+                            <Text className="upgrade-source">
+                              ⬆{getBuildingConfig(config.upgradeFrom)?.name}
+                            </Text>
+                          )}
                         </Text>
                         {triggerText && (
                           <Text className="trigger-text">{triggerText}</Text>
@@ -996,13 +1061,15 @@ export default function Game() {
                       <View className="building-meta">
                         <Text className="cost">
                           💰 {config.cost}
-                          {isFree && (
+                          {(isFree || isDirectBuy) && (
                             <Text className="discount"> → 免费</Text>
                           )}
-                          {!isFree && currentPlayer.taxReductionCards > 0 && actualCost < config.cost && (
-                            <Text className="discount"> → {actualCost}</Text>
-                          )}
                         </Text>
+                        {needsUpgradeCards && (
+                          <Text className="upgrade-cards-required">
+                            🎫 需要 {requiredUpgradeCards} 张升级卡
+                          </Text>
+                        )}
                         <Text className="owned">
                           已拥有: {currentPlayer.buildings.filter(b => b.configId === buildingId).length}
                         </Text>
@@ -1014,14 +1081,14 @@ export default function Game() {
                       </View>
                     </View>
                     <Button
-                      className={`buy-btn ${canAfford || isFree ? 'can-afford' : ''} ${isFree ? 'free' : ''}`}
+                      className={`buy-btn ${canAfford || isFree || isDirectBuy ? 'can-afford' : ''} ${isFree || isDirectBuy ? 'free' : ''}`}
                       onClick={() => handlePurchase(buildingId)}
                       disabled={
-                        (hasPurchased && !currentPlayer.canBuyExtra && !currentPlayer.canFreeBuilding) ||
+                        (hasPurchased && !currentPlayer.canBuyExtra && !currentPlayer.canFreeBuilding && !currentPlayer.canDirectBuyAdvanced) ||
                         !canAfford
                       }
                     >
-                      {isFree ? '免费获取' : (canAfford ? '购买' : '金币不足')}
+                      {isFree || isDirectBuy ? '免费获取' : (canAfford ? '购买' : '资源不足')}
                     </Button>
                   </View>
                 );
@@ -1525,10 +1592,26 @@ export default function Game() {
 
       {/* 购买成功动画 */}
       {purchaseAnimation.show && (
-        <View className="purchase-animation">
+        <View className={`purchase-animation ${purchaseAnimation.isLegendary ? 'legendary' : ''}`}>
+          {purchaseAnimation.isLegendary && (
+            <>
+              {/* 烟花粒子效果 - 20个随机分布的烟花爆炸 */}
+              <View className="fireworks-container">
+                {[...Array(20)].map((_, idx) => (
+                  <View key={`firework-${idx}`} className={`firework-burst firework-pos-${idx + 1}`}>
+                    {[...Array(12)].map((_, i) => (
+                      <View key={`fw${idx}-${i}`} className={`particle particle-${i + 1}`} />
+                    ))}
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
           <View className="purchase-card">
-            <Text className="purchase-icon">✨</Text>
-            <Text className="purchase-title">建造成功！</Text>
+            <Text className="purchase-icon">
+              {purchaseAnimation.isLegendary ? '✨⭐✨' : '✨'}
+            </Text>
+            <Text className="purchase-title">{purchaseAnimation.isLegendary ? '传奇建筑建成！' : '建造成功！'}</Text>
             <Text className="purchase-building">{purchaseAnimation.buildingName}</Text>
           </View>
         </View>

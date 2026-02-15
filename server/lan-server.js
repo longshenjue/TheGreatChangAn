@@ -667,11 +667,24 @@ wss.on('connection', (ws, req) => {
     
     const room = rooms.get(roomId);
     
-    if (!room || !room.gameState) {
-      console.error('❌ [游戏动作] 错误: 房间或游戏状态不存在');
-      console.error('  房间ID:', roomId);
-      console.error('  房间存在:', !!room);
-      console.error('  游戏状态存在:', !!room?.gameState);
+    if (!room) {
+      console.error('❌ [游戏动作] 错误: 房间不存在');
+      ws.send(JSON.stringify({
+        type: 'error',
+        message: '房间不存在'
+      }));
+      return;
+    }
+
+    // 如果是重新开始游戏，不需要游戏状态
+    if (action === 'restartGame') {
+      handleRestartGame(room, message.data);
+      return;
+    }
+
+    // 其他操作需要游戏状态
+    if (!room.gameState) {
+      console.error('❌ [游戏动作] 错误: 游戏状态不存在');
       ws.send(JSON.stringify({
         type: 'error',
         message: '游戏状态不存在'
@@ -845,6 +858,11 @@ wss.on('connection', (ws, req) => {
       const winCheck = gameEngine.checkWinCondition(gameState);
       if (winCheck.hasWinner) {
         console.log(`🎉 游戏结束！胜者: ${winCheck.winner.name}`);
+        
+        // 将房间状态设置为finished，但不删除房间
+        room.status = 'finished';
+        room.winner = winCheck.winner;
+        
         return {
           success: true,
           data: {
@@ -852,7 +870,10 @@ wss.on('connection', (ws, req) => {
             building: result.building,
             playerIndex: gameState.currentPlayerIndex,
             gameOver: true,
-            winner: winCheck.winner
+            winner: winCheck.winner,
+            winType: winCheck.winType,
+            totalAssets: winCheck.totalAssets,
+            message: winCheck.message
           }
         };
       }
@@ -869,6 +890,46 @@ wss.on('connection', (ws, req) => {
         playerIndex: gameState.currentPlayerIndex
       }
     };
+  }
+
+  // 处理重新开始游戏
+  function handleRestartGame(room, data) {
+    const { playerId } = data;
+    
+    console.log('🔄 [重新开始游戏] 房间:', room.code);
+    console.log('  请求玩家:', playerId?.substring(0, 8) + '...');
+    console.log('  房主:', room.hostId.substring(0, 8) + '...');
+    
+    // 只有房主可以重新开始游戏
+    if (playerId !== room.hostId) {
+      console.warn('⚠️ 只有房主可以重新开始游戏');
+      return;
+    }
+    
+    // 重置房间状态
+    room.status = 'waiting';
+    room.gameState = null;
+    room.winner = null;
+    
+    // 重置所有玩家的准备状态
+    room.players.forEach(player => {
+      if (player.userId !== room.hostId) {
+        player.ready = false;
+      }
+    });
+    
+    console.log('✅ 房间已重置，等待玩家准备');
+    
+    // 广播房间已重置
+    broadcastToRoom(room._id, {
+      type: 'roomUpdated',
+      data: { room }
+    });
+    
+    broadcastToRoom(room._id, {
+      type: 'gameRestarted',
+      data: { message: '房主已重新开始游戏，请重新准备' }
+    });
   }
 
   // 处理结束回合

@@ -226,34 +226,48 @@
             min-height: 100rpx !important;
             line-height: normal !important;
             padding: 0 !important;
-            background: rgba(139, 69, 19, 0.3) !important;
-            border: 2rpx solid rgba(255, 215, 0, 0.2) !important;
+            background: linear-gradient(135deg, rgba(100, 110, 150, 0.35) 0%, rgba(80, 100, 140, 0.35) 100%) !important;
+            border: 3rpx solid rgba(255, 215, 0, 0.7) !important;
             border-radius: 12rpx !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            opacity: 1 !important;
 
             .weather-btn-content {
               display: flex;
               flex-direction: column;
               align-items: center;
               gap: 8rpx;
+              position: relative;
+              z-index: 1;
 
               .weather-name {
                 font-size: 28rpx;
                 font-weight: 600;
-                color: rgba(255, 215, 0, 0.6);
+                color: #FFD700;
+                text-shadow: 2rpx 2rpx 4rpx rgba(0, 0, 0, 0.8);
               }
 
               .weather-desc {
                 font-size: 22rpx;
-                color: rgba(255, 215, 0, 0.4);
+                color: rgba(255, 255, 255, 1);
+                font-weight: 500;
+                text-shadow: 1rpx 1rpx 3rpx rgba(0, 0, 0, 0.7);
               }
             }
 
             &.active {
-              background: rgba(139, 69, 19, 0.7) !important;
-              border-color: rgba(255, 215, 0, 0.5) !important;
+              background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 180, 0, 0.3) 100%) !important;
+              border-color: #FFD700 !important;
+              border-width: 4rpx !important;
+              box-shadow: 0 0 35rpx rgba(255, 215, 0, 0.9), 
+                          inset 0 0 25rpx rgba(255, 215, 0, 0.25),
+                          0 8rpx 20rpx rgba(0, 0, 0, 0.4) !important;
+              transform: scale(1.02);
 
               .weather-btn-content {
                 .weather-name {
@@ -261,7 +275,7 @@
                 }
 
                 .weather-desc {
-                  color: rgba(255, 215, 0, 0.7);
+                  color: rgba(255, 255, 255, 1);
                 }
               }
             }

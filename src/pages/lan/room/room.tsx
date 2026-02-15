@@ -32,8 +32,8 @@ const LEGENDARY_BUILDINGS = [
   { id: 'kunmingchi', name: '昆明池', desc: '水系共鸣', required: true },
   { id: 'tiancefu', name: '天策府', desc: '火金联动', required: true },
   { id: 'leyouyuan', name: '乐游原', desc: '双骰收益提升', group: 'optional' },
-  { id: 'damminggong', name: '大明宫', desc: '翻转骰子', group: 'optional' },
-  { id: 'wanguolaizhao', name: '万国来朝', desc: '99金资产获胜', group: 'win' },
+  { id: 'damminggong', name: '大明宫', desc: '五行共鸣', group: 'optional' },
+  { id: 'wanguolaizhao', name: '万国来朝', desc: '存款99金获胜', group: 'win' },
   { id: 'jiudingshenmiao', name: '九鼎神庙', desc: '99金建造即胜', group: 'win' },
 ];
 
@@ -91,11 +91,26 @@ export default function LANRoom() {
     lanService.on('roomUpdated', handleRoomUpdated);
     lanService.on('roomDismissed', handleRoomDismissed);
     lanService.on('gameStarted', handleGameStarted);
+    lanService.on('gameRestarted', handleGameRestarted);
     lanService.on('playerDisconnected', handlePlayerDisconnected);
     lanService.on('playerReconnected', handlePlayerReconnected);
     lanService.on('playerLeft', handlePlayerLeft);
 
     // 请求房间列表以获取当前房间信息
+    refreshRoom();
+  };
+
+  // 处理游戏重新开始
+  const handleGameRestarted = (data: any) => {
+    console.log('🔄 收到游戏重新开始消息');
+    
+    Taro.showToast({
+      title: data.message || '游戏已重新开始',
+      icon: 'none',
+      duration: 2000
+    });
+    
+    // 刷新房间信息
     refreshRoom();
   };
   
@@ -281,6 +296,45 @@ export default function LANRoom() {
         if (res.confirm) {
           lanService.leaveRoom(roomId.current);
           Taro.navigateBack();
+        }
+      }
+    });
+  };
+
+  // 再来一局
+  const restartGame = () => {
+    if (!isHost || loading) return;
+    
+    Taro.showModal({
+      title: '确认重新开始',
+      content: '将重新开始游戏，所有玩家需要重新准备',
+      success: (res) => {
+        if (res.confirm) {
+          setLoading(true);
+          
+          try {
+            lanService.restartGame(roomId.current);
+            
+            Taro.showToast({
+              title: '游戏已重置',
+              icon: 'success',
+              duration: 1500
+            });
+            
+            // 刷新房间信息
+            setTimeout(() => {
+              refreshRoom();
+              setLoading(false);
+            }, 1500);
+          } catch (error: any) {
+            console.error('重新开始游戏失败:', error);
+            Taro.showToast({
+              title: error.message || '操作失败',
+              icon: 'none',
+              duration: 2000
+            });
+            setLoading(false);
+          }
         }
       }
     });
@@ -687,13 +741,11 @@ export default function LANRoom() {
                 )}
                 <View className="qr-text">
                   <Text className="qr-instruction">📱 扫码快速加入</Text>
-                  <Text className="qr-hint">或在浏览器输入</Text>
+                  <Text className="qr-hint">二维码包含完整连接信息</Text>
                   <Text className="qr-url">
-                    {serverInfo.ip === 'localhost' 
-                      ? `http://192.168.x.x:10086`
-                      : `http://${serverInfo.ip}:10086`}
+                    {generateConnectionText(serverInfo.ip, serverInfo.port, room.code)}
                   </Text>
-                  <Text className="qr-hint-small">然后进入局域网联机，输入房间号: <Text className="code-highlight">{room.code}</Text></Text>
+                  <Text className="qr-hint-small">扫码后将自动连接并加入房间 <Text className="code-highlight">{room.code}</Text></Text>
                 </View>
               </View>
 
@@ -718,20 +770,37 @@ export default function LANRoom() {
 
       {/* 底部操作按钮 */}
       <View className="footer">
-        {!isHost ? (
-          <View
-            className={`lan-custom-ready-btn ${isReady ? 'ready' : ''}`}
-            onClick={loading ? undefined : toggleReady}
-          >
-            {isReady ? '取消准备' : '准备'}
-          </View>
+        {room.status === 'finished' ? (
+          // 游戏结束状态
+          isHost ? (
+            <View
+              className="lan-custom-start-btn"
+              onClick={loading ? undefined : restartGame}
+            >
+              🔄 再来一局
+            </View>
+          ) : (
+            <View className="lan-custom-ready-btn disabled">
+              等待房主重新开始
+            </View>
+          )
         ) : (
-          <View
-            className={`lan-custom-start-btn ${loading ? 'disabled' : ''}`}
-            onClick={loading ? undefined : startGame}
-          >
-            {loading ? '启动中...' : '开始游戏'}
-          </View>
+          // 游戏等待状态
+          !isHost ? (
+            <View
+              className={`lan-custom-ready-btn ${isReady ? 'ready' : ''}`}
+              onClick={loading ? undefined : toggleReady}
+            >
+              {isReady ? '取消准备' : '准备'}
+            </View>
+          ) : (
+            <View
+              className={`lan-custom-start-btn ${loading ? 'disabled' : ''}`}
+              onClick={loading ? undefined : startGame}
+            >
+              {loading ? '启动中...' : '开始游戏'}
+            </View>
+          )
         )}
       </View>
     </View>

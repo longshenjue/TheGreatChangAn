@@ -43,8 +43,10 @@ function initializeGame(playerNames, weatherMode = 'prosperity', legendaryConfig
     })),
     diceCount: 1,
     taxReductionCards: 0,
+    upgradeCards: 0,
     canBuyExtra: false,
     canFreeBuilding: false,
+    canDirectBuyAdvanced: false,
     grandCanalTriggered: false,
   }));
 
@@ -225,6 +227,20 @@ function hasGrandCanal(player) {
 }
 
 /**
+ * 获取玩家拥有的五行属性种类数量（金木水火土）
+ */
+function getPlayerElementTypesCount(player) {
+  const elements = new Set();
+  player.buildings.forEach(building => {
+    const config = getBuildingConfig(building.configId);
+    if (config && config.element && config.element !== null) {
+      elements.add(config.element);
+    }
+  });
+  return elements.size;
+}
+
+/**
  * 计算火系费用（考虑金光罩）
  */
 function calculateFireCost(payer, baseCost) {
@@ -294,17 +310,31 @@ function processSettlement(diceResult, gameState, currentPlayer, isWeatherTrigge
     });
   }
 
-  // 6. 观星台收益
-  if (playerHasBuilding(currentPlayer, 'legendary_guanxingtai')) {
-    currentPlayer.gold += 1;
+  // 6. 矿冶所被动（每回合从国库获得1金）
+  if (playerHasBuilding(currentPlayer, 'metal_intermediate_kuangyesuo')) {
+    if (gameState.treasury >= 1) {
+      gameState.treasury -= 1;
+      currentPlayer.gold += 1;
+      allResults.push({
+        playerId: currentPlayer.id,
+        goldChange: 1,
+        description: `【矿冶所】${currentPlayer.name} 从国库获得 1 金`,
+      });
+    }
+  }
+
+  // 7. 大唐钱庄被动（利息收益）
+  if (playerHasBuilding(currentPlayer, 'metal_advanced_datangqianzhuang')) {
+    const interest = Math.max(1, Math.floor(currentPlayer.gold / 5));
+    currentPlayer.gold += interest;
     allResults.push({
       playerId: currentPlayer.id,
-      goldChange: 1,
-      description: `【观星台】${currentPlayer.name} 观星收益获得 1 金`,
+      goldChange: interest,
+      description: `【大唐钱庄】${currentPlayer.name} 获得存款利息 ${interest} 金`,
     });
   }
 
-  // 7. 大雁塔被动（金系共鸣）
+  // 8. 大雁塔被动（金系共鸣）
   if (playerHasBuilding(currentPlayer, 'legendary_dayanta')) {
     const metalCount = getPlayerBuildingCountByElement(currentPlayer, 'metal');
     if (metalCount > 0) {
@@ -317,7 +347,7 @@ function processSettlement(diceResult, gameState, currentPlayer, isWeatherTrigge
     }
   }
 
-  // 8. 昆明池被动（水系共鸣）
+  // 9. 昆明池被动（水系共鸣）
   if (playerHasBuilding(currentPlayer, 'legendary_kunmingchi')) {
     const waterCount = getPlayerBuildingCountByElement(currentPlayer, 'water');
     if (waterCount > 0) {
@@ -327,6 +357,51 @@ function processSettlement(diceResult, gameState, currentPlayer, isWeatherTrigge
         goldChange: waterCount,
         description: `【昆明池】${currentPlayer.name} 碧波荡漾获得 ${waterCount} 金`,
       });
+    }
+  }
+
+  // 10. 大明宫被动（盛世繁华）- 五行齐全时，每回合开始获得收益
+  if (playerHasBuilding(currentPlayer, 'legendary_damminggong')) {
+    const elementTypes = getPlayerElementTypesCount(currentPlayer);
+    
+    // 回合开始收益（在大雁塔、昆明池之后处理，属于回合开始阶段）
+    let turnStartBonus = 0;
+    if (elementTypes >= 3) {
+      if (elementTypes === 3) turnStartBonus = 2;
+      else if (elementTypes === 4) turnStartBonus = 4;
+      else if (elementTypes === 5) turnStartBonus = 8;
+      
+      currentPlayer.gold += turnStartBonus;
+      allResults.push({
+        playerId: currentPlayer.id,
+        goldChange: turnStartBonus,
+        description: `【大明宫】${currentPlayer.name} 盛世繁华（${elementTypes}种属性）获得 ${turnStartBonus} 金`,
+      });
+    }
+    
+    // 五行齐全时的建筑触发额外奖励
+    // 检查是否有真正的建筑触发（排除传奇建筑的固定收益）
+    const hasBuildingTriggered = allResults.some(result => 
+      result.playerId === currentPlayer.id && 
+      result.goldChange > 0 && 
+      !result.description.includes('【观星台】') &&
+      !result.description.includes('【大雁塔】') &&
+      !result.description.includes('【昆明池】') &&
+      !result.description.includes('【万国来朝】') &&
+      !result.description.includes('【大明宫】')
+    );
+    
+    if (elementTypes === 5 && hasBuildingTriggered) {
+      const treasuryBonus = Math.min(3, gameState.treasury);
+      if (treasuryBonus > 0) {
+        gameState.treasury -= treasuryBonus;
+        currentPlayer.gold += treasuryBonus;
+        allResults.push({
+          playerId: currentPlayer.id,
+          goldChange: treasuryBonus,
+          description: `【大明宫】${currentPlayer.name} 五行齐全，从国库额外获得 ${treasuryBonus} 金`,
+        });
+      }
     }
   }
 
@@ -543,7 +618,7 @@ function processSelfBuildings(diceResult, gameState, currentPlayer, multiplier) 
         break;
       case 'wood_advanced_hanlin':
         const woodCount = getPlayerBuildingCountByElement(currentPlayer, 'wood');
-        goldGain = (5 + woodCount * 2) * multiplier;
+        goldGain = (5 + woodCount * 1) * multiplier;
         break;
       case 'metal_basic_tiejiangpu':
         goldGain = 2 * multiplier;
@@ -562,18 +637,19 @@ function processSelfBuildings(diceResult, gameState, currentPlayer, multiplier) 
         break;
       case 'earth_basic_caishichang':
         goldGain = 1 * multiplier;
-        currentPlayer.taxReductionCards += 1;
-        extraEffect = '，获得 1 张减税卡';
+        currentPlayer.upgradeCards = (currentPlayer.upgradeCards || 0) + 1;
+        extraEffect = '，获得 1 张升级卡';
         break;
       case 'earth_intermediate_yingzaosi':
         goldGain = 3 * multiplier;
+        currentPlayer.upgradeCards = (currentPlayer.upgradeCards || 0) + 2;
         currentPlayer.canBuyExtra = true;
-        extraEffect = '，本回合可额外购买一张建筑';
+        extraEffect = '，获得 2 张升级卡，本回合可额外购买一张建筑';
         break;
       case 'earth_advanced_jitiantan':
         goldGain = 8 * multiplier;
-        currentPlayer.canFreeBuilding = true;
-        extraEffect = '，本回合可免费购买一张非传奇建筑';
+        currentPlayer.canDirectBuyAdvanced = true;
+        extraEffect = '，可直接0成本购买一张高级建筑';
         break;
     }
 
@@ -694,12 +770,28 @@ function purchaseBuilding(player, buildingId, gameState) {
   // 检查升级要求
   let upgradeSourceConfig = undefined;
   let isUpgrade = false;
-  if (config.requiresUpgrade && config.upgradeFrom) {
+  let upgradeCardsUsed = 0;
+  
+  // 检查是否是祭天坛的直接购买高级建筑
+  const isDirectAdvancedBuy = player.canDirectBuyAdvanced && config.level === 'advanced';
+  
+  if (!isDirectAdvancedBuy && config.requiresUpgrade && config.upgradeFrom) {
     const sourceBuilding = player.buildings.find(pb => pb.configId === config.upgradeFrom);
     if (!sourceBuilding) {
       upgradeSourceConfig = getBuildingConfig(config.upgradeFrom);
       return { success: false, message: `需要先拥有【${upgradeSourceConfig?.name}】才能升级为【${config.name}】` };
     }
+    
+    // 检查升级卡（所有高级建筑都需要3张升级卡）
+    if (config.level === 'advanced') {
+      const requiredCards = config.requiresUpgradeCards || 3;
+      const playerUpgradeCards = player.upgradeCards || 0;
+      if (playerUpgradeCards < requiredCards) {
+        return { success: false, message: `升级需要 ${requiredCards} 张升级卡（当前：${playerUpgradeCards}）` };
+      }
+      upgradeCardsUsed = requiredCards;
+    }
+    
     upgradeSourceConfig = getBuildingConfig(config.upgradeFrom);
     isUpgrade = true;
   }
@@ -713,8 +805,8 @@ function purchaseBuilding(player, buildingId, gameState) {
     player.hasPurchasedThisTurn = false;
   }
   
-  // 免费购买不算在购买次数内
-  if (!isFree) {
+  // 免费购买和祭天坛直接购买不算在购买次数内
+  if (!isFree && !isDirectAdvancedBuy) {
     // 如果已购买过，且没有额外购买权限，则拒绝
     if (player.hasPurchasedThisTurn && !player.canBuyExtra) {
       return { success: false, message: '每回合只能购买一个建筑' };
@@ -724,7 +816,7 @@ function purchaseBuilding(player, buildingId, gameState) {
   let cost = 0;
   let taxCardsToUse = 0;
   
-  if (!isFree) {
+  if (!isFree && !isDirectAdvancedBuy) {
     // 计算费用（考虑减税卡和升级折扣）
     cost = config.cost;
     if (isUpgrade && upgradeSourceConfig) {
@@ -742,19 +834,29 @@ function purchaseBuilding(player, buildingId, gameState) {
     // 扣除金币和减税卡
     player.gold -= cost;
     player.taxReductionCards -= taxCardsToUse;
-  } else {
+  } else if (isFree) {
     // 使用祭天坛免费购买，重置标记
     player.canFreeBuilding = false;
   }
 
-  // 如果是升级，消耗源建筑
-  if (isUpgrade && config.upgradeFrom) {
+  // 如果是升级，消耗源建筑和升级卡
+  if (isUpgrade && !isDirectAdvancedBuy && config.upgradeFrom) {
     const sourceIndex = player.buildings.findIndex(pb => pb.configId === config.upgradeFrom);
     if (sourceIndex !== -1) {
       player.buildings.splice(sourceIndex, 1);
       // 源建筑返回牌库
       gameState.availableBuildings[config.upgradeFrom]++;
     }
+    
+    // 消耗升级卡
+    if (upgradeCardsUsed > 0) {
+      player.upgradeCards = (player.upgradeCards || 0) - upgradeCardsUsed;
+    }
+  }
+  
+  // 如果是祭天坛直接购买高级建筑
+  if (isDirectAdvancedBuy) {
+    player.canDirectBuyAdvanced = false;
   }
 
   // 添加建筑
@@ -766,12 +868,17 @@ function purchaseBuilding(player, buildingId, gameState) {
   // 减少库存
   gameState.availableBuildings[buildingId]--;
 
-  // 国库税金：每次购买建筑（包括升级）时，国库+1金
-  gameState.treasury += 1;
+  // 国库税金：每次购买建筑（包括升级）时，国库增加建筑原价的20%（向上取整）
+  // 注意：祭天坛直接购买高级建筑（0成本）不缴税
+  let treasuryIncome = 0;
+  if (!isFree && !isDirectAdvancedBuy) {
+    treasuryIncome = Math.ceil(config.cost * 0.2);
+    gameState.treasury += treasuryIncome;
+  }
 
   // ⚠️ 【修复 Bug】更新购买状态
-  if (!isFree) {
-    // 免费购买不算在购买次数内
+  if (!isFree && !isDirectAdvancedBuy) {
+    // 免费购买和祭天坛直接购买不算在购买次数内
     if (!player.hasPurchasedThisTurn) {
       // 第一次购买
       player.hasPurchasedThisTurn = true;
@@ -787,13 +894,23 @@ function purchaseBuilding(player, buildingId, gameState) {
   }
 
   const taxInfo = taxCardsToUse > 0 ? `（使用了 ${taxCardsToUse} 张减税卡）` : '';
-  const upgradeInfo = isUpgrade && upgradeSourceConfig ? `（升级自【${upgradeSourceConfig.name}】）` : '';
-  const treasuryTax = '（国库+1金）';
+  const upgradeCardInfo = upgradeCardsUsed > 0 ? `（使用了 ${upgradeCardsUsed} 张升级卡）` : '';
+  const upgradeInfo = isUpgrade && upgradeSourceConfig && !isDirectAdvancedBuy ? `（升级自【${upgradeSourceConfig.name}】）` : '';
+  const directBuyInfo = isDirectAdvancedBuy ? '（祭天坛直接购买）' : '';
+  const freeInfo = isFree ? '（祭天坛免费购买）' : '';
+  const treasuryTax = (treasuryIncome > 0) ? `（国库+${treasuryIncome}金）` : '';
+  
+  let costInfo = '';
+  if (!isFree && !isDirectAdvancedBuy) {
+    costInfo = `，花费 ${cost} 金${taxInfo}`;
+  } else {
+    costInfo = '，0成本';
+  }
   
   return {
     success: true,
     building: config,
-    message: `成功建造【${config.name}】${upgradeInfo}，花费 ${cost} 金${taxInfo}${treasuryTax}`,
+    message: `成功建造【${config.name}】${upgradeInfo}${directBuyInfo}${freeInfo}${costInfo}${upgradeCardInfo}${treasuryTax}`,
   };
 }
 
@@ -817,15 +934,27 @@ function calculateTotalAssets(player, allBuildings) {
  * 检查胜利条件
  */
 function checkWinCondition(gameState) {
-  const targetAssets = 100; // 100金胜利
-
   for (const player of gameState.players) {
-    const totalAssets = calculateTotalAssets(player, gameState.allBuildings);
-    if (totalAssets >= targetAssets) {
+    // 检查九鼎神庙胜利（购买即获胜）
+    const hasJiuding = player.buildings.some(b => b.configId === 'legendary_jiudingshenmiao');
+    if (hasJiuding) {
       return {
         hasWinner: true,
         winner: player,
-        totalAssets
+        winType: 'instant',
+        message: `【九鼎神庙】${player.name} 建造九鼎神庙，立即获胜！`
+      };
+    }
+
+    // 检查万国来朝胜利（必须拥有万国来朝，且存款≥99金）
+    const hasWanguolaizhao = player.buildings.some(b => b.configId === 'legendary_wanguolaizhao');
+    if (hasWanguolaizhao && player.gold >= 99) {
+      return {
+        hasWinner: true,
+        winner: player,
+        winType: 'wanguolaizhao',
+        totalAssets: player.gold,
+        message: `【万国来朝】${player.name} 存款达到 ${player.gold} 金，获胜！`
       };
     }
   }
@@ -842,6 +971,7 @@ function endTurn(gameState) {
   // 重置回合标记
   currentPlayer.canBuyExtra = false;
   currentPlayer.canFreeBuilding = false;
+  currentPlayer.canDirectBuyAdvanced = false;
   currentPlayer.grandCanalTriggered = false;
   currentPlayer.hasPurchasedThisTurn = false;  // ⚠️ 【修复 Bug】重置购买状态
 
@@ -864,6 +994,7 @@ module.exports = {
   getBuildingConfig,
   playerHasBuilding,
   getPlayerBuildingCountByElement,
+  getPlayerElementTypesCount,
   processSettlement,
   purchaseBuilding,
   calculateTotalAssets,

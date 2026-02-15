@@ -368,6 +368,13 @@ class LANService {
   }
 
   /**
+   * 重新开始游戏
+   */
+  restartGame(roomId: string): void {
+    this.sendGameAction(roomId, 'restartGame', {});
+  }
+
+  /**
    * 发送游戏操作（服务器权威模式 - 只发送指令）
    */
   sendGameAction(roomId: string, action: string, data: any = {}): void {

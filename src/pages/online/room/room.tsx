@@ -28,9 +28,9 @@ const LEGENDARY_BUILDINGS = [
   { id: 'guanxingtai', name: '观星台', desc: '解锁双骰', required: true },
   { id: 'dayunhe', name: '大运河', desc: '水木相生', required: true },
   { id: 'leyouyuan', name: '乐游原', desc: '双骰收益提升', group: 'optional' },
-  { id: 'damminggong', name: '大明宫', desc: '翻转骰子', group: 'optional' },
+  { id: 'damminggong', name: '大明宫', desc: '五行共鸣', group: 'optional' },
   { id: 'tiancefu', name: '天策府', desc: '火金联动', group: 'optional' },
-  { id: 'wanguolaizhao', name: '万国来朝', desc: '99金资产获胜', group: 'win' },
+  { id: 'wanguolaizhao', name: '万国来朝', desc: '存款99金获胜', group: 'win' },
   { id: 'jiudingshenmiao', name: '九鼎神庙', desc: '99金建造即胜', group: 'win' },
 ];
 

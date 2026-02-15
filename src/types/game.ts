@@ -39,6 +39,7 @@ export interface BuildingConfig {
   passive?: boolean;        // 是否有被动效果
   requiresUpgrade?: boolean; // 是否需要升级获得
   upgradeFrom?: string;     // 升级所需的中级建筑ID
+  requiresUpgradeCards?: number; // 升级所需的升级卡数量
 }
 
 // 玩家建筑
@@ -54,9 +55,11 @@ export interface Player {
   gold: number;
   buildings: PlayerBuilding[];
   diceCount: number;
-  taxReductionCards: number; // 减税卡数量
+  taxReductionCards: number; // 减税卡数量（已废弃，保留兼容）
+  upgradeCards?: number;     // 升级卡数量
   canBuyExtra: boolean;      // 本回合是否可额外购买建筑
   canFreeBuilding: boolean;  // 本回合是否可免费购买建筑（祭天坛）
+  canDirectBuyAdvanced?: boolean; // 本回合是否可直接购买高级建筑（祭天坛触发）
   grandCanalTriggered?: boolean; // 大运河本回合是否已触发
 }
 

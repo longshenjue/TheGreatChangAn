@@ -185,7 +185,7 @@ export default function Index() {
                 <Text className="legendary-name">
                   {selectedLegendary.damminggong ? '✓' : '○'} 大明宫
                 </Text>
-                <Text className="legendary-desc">翻转骰子</Text>
+                <Text className="legendary-desc">五行共鸣</Text>
               </View>
               <View 
                 className={`legendary-item ${selectedLegendary.tiancefu ? 'active' : ''}`}
@@ -207,7 +207,7 @@ export default function Index() {
                 <Text className="legendary-name">
                   {selectedLegendary.wanguolaizhao ? '✓' : '○'} 万国来朝
                 </Text>
-                <Text className="legendary-desc">建造后积累99金资产获胜</Text>
+                <Text className="legendary-desc">建造后存款达到99金获胜</Text>
               </View>
               <View 
                 className={`legendary-item ${selectedLegendary.jiudingshenmiao ? 'active' : ''}`}

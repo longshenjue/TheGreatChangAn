@@ -249,9 +249,15 @@ taro-button-core {
         display: flex;
         gap: 20px;
 
-        .gold, .tax-card {
+        .gold, .upgrade-card {
           font-size: 28px;
           color: $text-primary;
+          font-weight: bold;
+        }
+        
+        .upgrade-card {
+          color: #FFD700;
+          text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
         }
       }
     }
@@ -942,7 +948,21 @@ taro-button-core {
           .building-title {
             font-size: 30px;
             font-weight: bold;
-            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+            
+            .upgrade-source {
+              font-size: 20px;
+              color: rgba(212, 175, 55, 0.6);
+              font-weight: normal;
+              background: rgba(212, 175, 55, 0.1);
+              padding: 2px 8px;
+              border-radius: 6px;
+              border: 1px solid rgba(212, 175, 55, 0.25);
+              white-space: nowrap;
+            }
           }
 
           .trigger-text {
@@ -969,12 +989,15 @@ taro-button-core {
 
           .building-meta {
             display: flex;
-            gap: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
 
             .cost {
               font-size: 26px;
               color: $text-secondary;
               font-weight: bold;
+              flex-shrink: 0;
               
               .discount {
                 color: #52c41a;
@@ -982,16 +1005,31 @@ taro-button-core {
               }
             }
 
+            .upgrade-cards-required {
+              font-size: 24px;
+              color: #FFD700;
+              background: rgba(255, 215, 0, 0.15);
+              padding: 4px 12px;
+              border-radius: 8px;
+              border: 2px solid rgba(255, 215, 0, 0.4);
+              white-space: nowrap;
+              flex-shrink: 0;
+              font-weight: bold;
+              box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+            }
+
             .owned {
               font-size: 26px;
               color: #52c41a;
               opacity: 0.9;
+              flex-shrink: 0;
             }
 
             .stock {
               font-size: 26px;
               color: $text-secondary;
               opacity: 0.7;
+              flex-shrink: 0;
             }
           }
         }
@@ -1500,6 +1538,115 @@ taro-button-core {
       text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
     }
   }
+
+  // 传奇建筑特殊效果
+  &.legendary {
+    animation: legendaryPopIn 0.8s ease-out;
+
+    // 烟花容器（以中心卡片为基准）
+    .fireworks-container {
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    // 烟花爆炸点
+    .firework-burst {
+      position: absolute;
+      width: 0;
+      height: 0;
+      
+      // 粒子（从爆炸点中心向外飞）
+      .particle {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: 0 0 20px 4px rgba(255, 255, 255, 0.9);
+        animation-duration: 2.5s;
+        animation-timing-function: ease-out;
+        animation-iteration-count: infinite;
+        filter: blur(0.5px);
+        left: -6px;  // 居中粒子
+        top: -6px;   // 居中粒子
+      }
+
+      // 12个粒子的不同方向和丰富的颜色
+      .particle-1 { animation-name: particleExplode-1; background: linear-gradient(135deg, #FFD700, #FFA500); } // 金色
+      .particle-2 { animation-name: particleExplode-2; background: linear-gradient(135deg, #FF6B9D, #C44569); animation-delay: 0.05s; } // 粉红
+      .particle-3 { animation-name: particleExplode-3; background: linear-gradient(135deg, #A8E6CF, #4ECDC4); animation-delay: 0.1s; } // 青绿
+      .particle-4 { animation-name: particleExplode-4; background: linear-gradient(135deg, #9B59B6, #8E44AD); animation-delay: 0.15s; } // 紫色
+      .particle-5 { animation-name: particleExplode-5; background: linear-gradient(135deg, #FF8C42, #FF6347); animation-delay: 0.2s; } // 橙红
+      .particle-6 { animation-name: particleExplode-6; background: linear-gradient(135deg, #3498DB, #2980B9); animation-delay: 0.25s; } // 蓝色
+      .particle-7 { animation-name: particleExplode-7; background: linear-gradient(135deg, #F39C12, #E67E22); animation-delay: 0.3s; } // 黄橙
+      .particle-8 { animation-name: particleExplode-8; background: linear-gradient(135deg, #E74C3C, #C0392B); animation-delay: 0.35s; } // 红色
+      .particle-9 { animation-name: particleExplode-9; background: linear-gradient(135deg, #1ABC9C, #16A085); animation-delay: 0.4s; } // 青色
+      .particle-10 { animation-name: particleExplode-10; background: linear-gradient(135deg, #E91E63, #AD1457); animation-delay: 0.45s; } // 玫红
+      .particle-11 { animation-name: particleExplode-11; background: linear-gradient(135deg, #00BCD4, #0097A7); animation-delay: 0.5s; } // 天蓝
+      .particle-12 { animation-name: particleExplode-12; background: linear-gradient(135deg, #FFEB3B, #FBC02D); animation-delay: 0.55s; } // 亮黄
+    }
+
+    // 20个烟花爆炸位置（围绕容器中心形成圆圈，半径250px，每18度一个）
+    .firework-pos-1 { top: 150px; left: 400px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 0s; } // 0度
+    .firework-pos-2 { top: 162px; left: 477px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 0.12s; } // 18度
+    .firework-pos-3 { top: 197px; left: 547px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 0.24s; } // 36度
+    .firework-pos-4 { top: 253px; left: 603px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 0.36s; } // 54度
+    .firework-pos-5 { top: 323px; left: 638px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 0.48s; } // 72度
+    .firework-pos-6 { top: 400px; left: 650px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 0.6s; } // 90度
+    .firework-pos-7 { top: 477px; left: 638px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 0.72s; } // 108度
+    .firework-pos-8 { top: 547px; left: 603px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 0.84s; } // 126度
+    .firework-pos-9 { top: 603px; left: 547px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 0.96s; } // 144度
+    .firework-pos-10 { top: 638px; left: 477px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 1.08s; } // 162度
+    .firework-pos-11 { top: 650px; left: 400px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 1.2s; } // 180度
+    .firework-pos-12 { top: 638px; left: 323px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 1.32s; } // 198度
+    .firework-pos-13 { top: 603px; left: 253px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 1.44s; } // 216度
+    .firework-pos-14 { top: 547px; left: 197px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 1.56s; } // 234度
+    .firework-pos-15 { top: 477px; left: 162px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 1.68s; } // 252度
+    .firework-pos-16 { top: 400px; left: 150px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 1.8s; } // 270度
+    .firework-pos-17 { top: 323px; left: 162px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 1.92s; } // 288度
+    .firework-pos-18 { top: 253px; left: 197px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 2.04s; } // 306度
+    .firework-pos-19 { top: 197px; left: 253px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 2.16s; } // 324度
+    .firework-pos-20 { top: 162px; left: 323px; animation: fireworkBurstDelay 2.5s ease-out infinite; animation-delay: 2.28s; } // 342度
+
+    .purchase-card {
+      background: linear-gradient(135deg, #9B59B6 0%, #E74C3C 50%, #F39C12 100%);
+      border: 4px solid #FFD700;
+      box-shadow: 0 0 80px rgba(155, 89, 182, 1),
+                  0 0 40px rgba(231, 76, 60, 1),
+                  inset 0 0 30px rgba(255, 215, 0, 0.3),
+                  0 15px 50px rgba(0, 0, 0, 0.5);
+      animation: legendaryPulse 0.8s ease-in-out infinite alternate;
+      position: relative;
+      z-index: 1;
+
+      .purchase-icon {
+        font-size: 80px;
+        animation: legendaryRotate 2s ease-in-out infinite;
+        filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+        letter-spacing: 8px;
+      }
+
+      .purchase-title {
+        font-size: 40px;
+        color: #FFD700;
+        text-shadow: 0 0 15px rgba(255, 215, 0, 0.8),
+                     2px 2px 8px rgba(0, 0, 0, 0.8);
+        animation: legendaryGlow 1s ease-in-out infinite alternate;
+      }
+
+      .purchase-building {
+        font-size: 36px;
+        color: #FFFFFF;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                     2px 2px 6px rgba(0, 0, 0, 0.6);
+      }
+    }
+  }
 }
 
 @keyframes purchasePopIn {
@@ -1531,6 +1678,174 @@ taro-button-core {
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+// 传奇建筑动画
+@keyframes legendaryPopIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
+  }
+  40% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.15) rotate(5deg);
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(0.95) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes legendaryPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 80px rgba(155, 89, 182, 0.8),
+                0 0 40px rgba(231, 76, 60, 0.8),
+                inset 0 0 30px rgba(255, 215, 0, 0.2),
+                0 15px 50px rgba(0, 0, 0, 0.5);
+  }
+  100% {
+    transform: scale(1.08);
+    box-shadow: 0 0 120px rgba(155, 89, 182, 1),
+                0 0 60px rgba(231, 76, 60, 1),
+                inset 0 0 40px rgba(255, 215, 0, 0.4),
+                0 20px 60px rgba(0, 0, 0, 0.6);
+  }
+}
+
+@keyframes legendaryRotate {
+  0%, 100% {
+    transform: rotate(-5deg) scale(1);
+  }
+  25% {
+    transform: rotate(5deg) scale(1.1);
+  }
+  50% {
+    transform: rotate(-5deg) scale(1);
+  }
+  75% {
+    transform: rotate(5deg) scale(1.1);
+  }
+}
+
+@keyframes legendaryGlow {
+  0% {
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.6),
+                 2px 2px 8px rgba(0, 0, 0, 0.8);
+  }
+  100% {
+    text-shadow: 0 0 25px rgba(255, 215, 0, 1),
+                 0 0 40px rgba(255, 215, 0, 0.6),
+                 2px 2px 8px rgba(0, 0, 0, 0.8);
+  }
+}
+
+// 12个方向的粒子爆炸动画（每隔30度，距离更远，速度更慢）
+@keyframes particleExplode-1 {  // 0度 (→)
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(280px, 0) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-2 {  // 30度
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(242px, 140px) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-3 {  // 60度
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(140px, 242px) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-4 {  // 90度 (↓)
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(0, 280px) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-5 {  // 120度
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(-140px, 242px) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-6 {  // 150度
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(-242px, 140px) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-7 {  // 180度 (←)
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(-280px, 0) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-8 {  // 210度
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(-242px, -140px) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-9 {  // 240度
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(-140px, -242px) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-10 { // 270度 (↑)
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(0, -280px) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-11 { // 300度
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(140px, -242px) scale(0.2); opacity: 0; }
+}
+
+@keyframes particleExplode-12 { // 330度
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  5% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(242px, -140px) scale(0.2); opacity: 0; }
+}
+
+// 烟花爆炸延迟动画
+@keyframes fireworkBurstDelay {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  3% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  97% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
   }
 }
 

@@ -54,12 +54,20 @@ export default function LANConnect() {
       setServerPort(lastPort || defaultConfig.port);
     }
     
-    // 昵称
+    // 昵称：优先使用缓存，如果没有则生成随机昵称
+    let finalNickname = '';
     if (params?.nickname) {
-      setNickname(decodeURIComponent(params.nickname));
+      finalNickname = decodeURIComponent(params.nickname);
     } else if (lastNickname) {
-      setNickname(lastNickname);
+      finalNickname = lastNickname;
+    } else {
+      // 生成随机4位数字昵称
+      finalNickname = `玩家${Math.floor(1000 + Math.random() * 9000)}`;
+      console.log('🎲 自动生成随机昵称:', finalNickname);
+      // 保存到localStorage
+      Taro.setStorageSync('lan_nickname', finalNickname);
     }
+    setNickname(finalNickname);
     
     // 如果有roomCode，说明是通过二维码直接加入房间
     if (params?.roomCode) {
@@ -68,6 +76,14 @@ export default function LANConnect() {
       console.log('🎯 [连接页面] 检测到房间号，将自动连接并加入房间');
       // 保存到state，稍后在连接成功后自动加入
       (window as any).__autoJoinRoomCode = roomCode;
+      
+      // ✨ 自动连接：如果有昵称和房间号，直接触发连接
+      setTimeout(() => {
+        if (finalNickname) {
+          console.log('🚀 自动触发快速连接');
+          autoConnectAndJoin(urlIP || lastIP || defaultConfig.host, urlPort || lastPort || defaultConfig.port, finalNickname, roomCode);
+        }
+      }, 500);
     }
     
     // 监听自动重连房间事件
@@ -248,6 +264,71 @@ export default function LANConnect() {
       Taro.hideLoading();
       console.error('连接失败:', error);
       throw error;
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  // 自动连接并加入房间（二维码扫描时使用）
+  const autoConnectAndJoin = async (ip: string, port: string, nickName: string, roomCode: string) => {
+    if (connecting) return;
+    
+    setConnecting(true);
+    console.log('🚀 [自动连接] 开始自动连接并加入房间');
+    console.log('  IP:', ip);
+    console.log('  端口:', port);
+    console.log('  昵称:', nickName);
+    console.log('  房间号:', roomCode);
+    
+    Taro.showLoading({ title: '正在加入房间...' });
+
+    try {
+      // 设置玩家信息
+      lanService.setPlayerInfo(nickName);
+      
+      // 保存连接信息
+      Taro.setStorageSync('lan_nickname', nickName);
+      Taro.setStorageSync('lan_last_ip', ip);
+      Taro.setStorageSync('lan_last_port', port);
+
+      // 连接到服务器
+      await lanService.connect(ip, parseInt(port));
+      console.log('✅ 已连接到服务器');
+
+      // 查找并加入房间
+      const rooms = await lanService.getRooms();
+      const targetRoom = rooms.find((r: any) => r.code === roomCode);
+      
+      if (targetRoom) {
+        await lanService.joinRoom(targetRoom._id);
+        
+        Taro.hideLoading();
+        Taro.showToast({
+          title: '加入成功！',
+          icon: 'success',
+          duration: 1500
+        });
+
+        // 清除自动加入标记
+        delete (window as any).__autoJoinRoomCode;
+
+        // 跳转到房间页面
+        setTimeout(() => {
+          Taro.redirectTo({
+            url: `/pages/lan/room/room?roomId=${targetRoom._id}`
+          });
+        }, 1500);
+      } else {
+        throw new Error(`房间 ${roomCode} 不存在或已关闭`);
+      }
+    } catch (error: any) {
+      Taro.hideLoading();
+      console.error('自动连接失败:', error);
+      Taro.showModal({
+        title: '加入房间失败',
+        content: error.message || '无法加入指定房间',
+        showCancel: false
+      });
     } finally {
       setConnecting(false);
     }

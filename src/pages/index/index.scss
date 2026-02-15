@@ -86,8 +86,9 @@ $gold: #d4af37;
 }
 
 .settings-section {
-  max-width: 700px;
-  margin: 0 auto;
+  width: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 .setting-card {
@@ -200,39 +201,52 @@ $gold: #d4af37;
   .weather-option {
     flex: 1;
     padding: 30px 20px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(212, 175, 55, 0.5);
-    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(100, 110, 150, 0.35) 0%, rgba(80, 100, 140, 0.35) 100%);
+    border: 3px solid rgba(255, 215, 0, 0.7);
+    border-radius: 16px;
     text-align: center;
     transition: all 0.3s;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: relative;
+    opacity: 1;
 
     &:hover {
-      background: rgba(212, 175, 55, 0.15);
-      border-color: rgba(212, 175, 55, 0.7);
+      background: linear-gradient(135deg, rgba(120, 130, 170, 0.45) 0%, rgba(100, 120, 160, 0.45) 100%);
+      border-color: rgba(255, 215, 0, 1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
     }
 
     &.active {
-      background: rgba(212, 175, 55, 0.3);
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 180, 0, 0.3) 100%);
       border-color: $secondary-color;
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border-width: 4px;
+      box-shadow: 0 0 35px rgba(255, 215, 0, 0.9), 
+                  inset 0 0 25px rgba(255, 215, 0, 0.25),
+                  0 8px 20px rgba(0, 0, 0, 0.4);
+      transform: scale(1.02);
     }
 
     .weather-name {
       display: block;
       font-size: 32px;
-      color: $text-primary;
+      color: #FFD700;
       font-weight: bold;
       margin-bottom: 12px;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      position: relative;
+      z-index: 1;
     }
 
     .weather-desc {
       display: block;
       font-size: 24px;
-      color: $text-secondary;
-      opacity: 0.9;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+      color: rgba(255, 255, 255, 1);
+      font-weight: 500;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+      position: relative;
+      z-index: 1;
     }
   }
 }

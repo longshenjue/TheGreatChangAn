@@ -357,10 +357,13 @@
             min-height: 100px;
             
             // 视觉样式（使用 !important）
-            background: rgba(255, 255, 255, 0.05) !important;
+            background: linear-gradient(135deg, rgba(100, 110, 150, 0.35) 0%, rgba(80, 100, 140, 0.35) 100%) !important;
             background-color: transparent !important;
-            border: 2px solid rgba(255, 215, 0, 0.3) !important;
+            border: 3px solid rgba(255, 215, 0, 0.7) !important;
             border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+            opacity: 1 !important;
             
             // 重置
             cursor: pointer;
@@ -375,10 +378,21 @@
               display: none;
             }
 
+            &:hover {
+              background: linear-gradient(135deg, rgba(120, 130, 170, 0.45) 0%, rgba(100, 120, 160, 0.45) 100%) !important;
+              border-color: rgba(255, 215, 0, 1) !important;
+              transform: translateY(-2px);
+              box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
+            }
+
             &.active {
-              background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.2)) !important;
-              border-color: #667eea !important;
-              box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+              background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 180, 0, 0.3) 100%) !important;
+              border-color: #FFD700 !important;
+              border-width: 4px !important;
+              box-shadow: 0 0 35px rgba(255, 215, 0, 0.9), 
+                          inset 0 0 25px rgba(255, 215, 0, 0.25),
+                          0 8px 20px rgba(0, 0, 0, 0.4) !important;
+              transform: scale(1.02);
             }
 
             &[disabled] {
@@ -394,20 +408,25 @@
               flex-direction: column;
               align-items: center;
               gap: 10px;
+              position: relative;
+              z-index: 1;
 
               taro-text-core.weather-name {
                 font-size: 28px;
-                color: #ffd700;
+                color: #FFD700;
                 font-weight: bold;
                 white-space: nowrap;
                 display: block;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
               }
 
               taro-text-core.weather-desc {
                 font-size: 22px;
-                color: #a0a0b0;
+                color: rgba(255, 255, 255, 1);
+                font-weight: 500;
                 white-space: nowrap;
                 display: block;
+                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
               }
             }
           }

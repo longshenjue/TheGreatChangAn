@@ -7,7 +7,7 @@
       "level": "basic",
       "triggerNumbers": [1, 2],
       "cost": 1,
-      "quantity": 8,
+      "quantity": 12,
       "triggerType": "self_roll",
       "effect": "自己掷出：得 1金",
       "effectFunction": "gainGold_1"
@@ -19,7 +19,7 @@
       "level": "intermediate",
       "triggerNumbers": [3],
       "cost": 3,
-      "quantity": 6,
+      "quantity": 8,
       "triggerType": "self_roll",
       "effect": "自己掷出：得 2金",
       "effectFunction": "gainGold_2"
@@ -34,10 +34,11 @@
       "quantity": 4,
       "maxPerPlayer": 1,
       "requiresUpgrade": true,
+      "requiresUpgradeCards": 3,
       "upgradeFrom": "wood_intermediate_caoyaopu",
       "triggerType": "self_roll",
-      "effect": "自己掷出：获得 5金，名下每有 1张【木】卡，额外得 2金",
-      "effectFunction": "gainGoldPerWood_2_plus5"
+      "effect": "自己掷出：获得 5金，名下每有 1张【木】卡，额外得 1金。（需要3张升级卡）",
+      "effectFunction": "gainGoldPerWood_1_plus5"
     },
     {
       "id": "water_basic_yuliang",
@@ -46,7 +47,7 @@
       "level": "basic",
       "triggerNumbers": [1],
       "cost": 2,
-      "quantity": 8,
+      "quantity": 12,
       "triggerType": "any_roll",
       "effect": "任何人掷出：得 1金",
       "effectFunction": "gainGold_1"
@@ -58,7 +59,7 @@
       "level": "intermediate",
       "triggerNumbers": [6],
       "cost": 4,
-      "quantity": 6,
+      "quantity": 8,
       "triggerType": "any_roll",
       "effect": "任何人掷出：得 2金",
       "effectFunction": "gainGold_2"
@@ -73,9 +74,10 @@
       "quantity": 4,
       "maxPerPlayer": 1,
       "requiresUpgrade": true,
+      "requiresUpgradeCards": 3,
       "upgradeFrom": "water_intermediate_yantian",
       "triggerType": "any_roll",
-      "effect": "任何人掷出：获得 5金，全场每有 1张【水】卡，你额外得 1金",
+      "effect": "任何人掷出：获得 5金，全场每有 1张【水】卡，你额外得 1金。（需要3张升级卡）",
       "effectFunction": "gainGoldPerAllWater_1_plus5"
     },
     {
@@ -85,7 +87,7 @@
       "level": "basic",
       "triggerNumbers": [3],
       "cost": 3,
-      "quantity": 6,
+      "quantity": 10,
       "triggerType": "others_roll",
       "effect": "别人掷出：向其收取 2金",
       "effectFunction": "chargeGold_2"
@@ -97,9 +99,9 @@
       "level": "intermediate",
       "triggerNumbers": [4, 8],
       "cost": 5,
-      "quantity": 4,
+      "quantity": 8,
       "triggerType": "self_roll",
-      "effect": "自己掷4或8：向全场每人收 3金。若对方现金不足3金，则破坏其任意一张初级建筑",
+      "effect": "自己掷4或8：向全场每人收 3金。若对方现金不足3金，则破坏其任意一张非传奇建筑（返回商店）",
       "effectFunction": "chargeAllOrDestroy_3"
     },
     {
@@ -112,9 +114,10 @@
       "quantity": 4,
       "maxPerPlayer": 1,
       "requiresUpgrade": true,
+      "requiresUpgradeCards": 3,
       "upgradeFrom": "fire_intermediate_biaoju",
       "triggerType": "others_roll",
-      "effect": "别人掷出：无视金光罩，收其现金的 1/3（上限 20金）",
+      "effect": "别人掷出：无视金光罩，收其现金的 1/3（上限 20金）。（需要3张升级卡）",
       "effectFunction": "chargeThirdGold_20"
     },
     {
@@ -124,7 +127,7 @@
       "level": "basic",
       "triggerNumbers": [2],
       "cost": 3,
-      "quantity": 8,
+      "quantity": 12,
       "triggerType": "self_roll",
       "effect": "自己掷出：得 2金",
       "effectFunction": "gainGold_2"
@@ -136,9 +139,9 @@
       "level": "intermediate",
       "triggerNumbers": [5],
       "cost": 5,
-      "quantity": 5,
+      "quantity": 8,
       "triggerType": "self_roll",
-      "effect": "自己掷出：得 5金。被动（金光罩）：支付给火系费用减半",
+      "effect": "自己掷出：得 5金。被动：金光罩（支付给火系费用减半）；每回合开始从国库获得1金",
       "effectFunction": "gainGold_5",
       "passive": true
     },
@@ -152,10 +155,12 @@
       "quantity": 4,
       "maxPerPlayer": 1,
       "requiresUpgrade": true,
+      "requiresUpgradeCards": 3,
       "upgradeFrom": "metal_intermediate_kuangyesuo",
       "triggerType": "self_roll",
-      "effect": "自己掷出：现金增加 30%（上限 25金），并从国库获得 5金",
-      "effectFunction": "increaseGoldAndTreasury"
+      "effect": "自己掷出：现金增加 30%（上限 25金），并从国库获得 5金。被动：每回合开始获得存款的 1/5 利息（向下取整，至少1金）。（需要3张升级卡）",
+      "effectFunction": "increaseGoldAndTreasury",
+      "passive": true
     },
     {
       "id": "earth_basic_caishichang",
@@ -164,10 +169,10 @@
       "level": "basic",
       "triggerNumbers": [4],
       "cost": 3,
-      "quantity": 8,
+      "quantity": 12,
       "triggerType": "self_roll",
-      "effect": "自己掷出：得 1金，获得一张减税卡，用于购买建筑费用时费用减1",
-      "effectFunction": "gainGoldAndTaxCard_1"
+      "effect": "自己掷出：得 1金，获得一张升级卡。（升级卡用于中级建筑升级到高级建筑，每次升级需要3张）",
+      "effectFunction": "gainGoldAndUpgradeCard_1"
     },
     {
       "id": "earth_intermediate_yingzaosi",
@@ -176,10 +181,10 @@
       "level": "intermediate",
       "triggerNumbers": [8],
       "cost": 6,
-      "quantity": 6,
+      "quantity": 8,
       "triggerType": "self_roll",
-      "effect": "自己掷出：得 3金，本回合可额外多买一张建筑",
-      "effectFunction": "gainGoldAndExtraBuild_3"
+      "effect": "自己掷出：得 3金，获得2张升级卡，本回合可额外多买一张建筑",
+      "effectFunction": "gainGoldAndUpgradeCards_3_2"
     },
     {
       "id": "earth_advanced_jitiantan",
@@ -191,10 +196,11 @@
       "quantity": 4,
       "maxPerPlayer": 1,
       "requiresUpgrade": true,
+      "requiresUpgradeCards": 3,
       "upgradeFrom": "earth_intermediate_yingzaosi",
       "triggerType": "self_roll",
-      "effect": "自己掷出：本回合可免费购买一张非传奇建筑，并获得 8金",
-      "effectFunction": "freeBuildingAndGold_8"
+      "effect": "自己掷出：获得 8金，可直接0成本购买一张高级建筑（无需消耗中级建筑，无需升级卡）。（需要3张升级卡）",
+      "effectFunction": "directBuyAdvancedAndGold_8"
     }
   ],
   "legendaryBuildings": [
@@ -204,13 +210,12 @@
       "element": null,
       "level": "legendary",
       "triggerNumbers": [],
-      "cost": 8,
+      "cost": 10,
       "quantity": 4,
       "maxPerPlayer": 1,
       "triggerType": "special",
-      "effect": "解锁双骰：可选择投掷1颗或2颗骰子。被动（观星收益）：每回合获得1金",
-      "effectFunction": "unlockDoubleDice",
-      "passive": true
+      "effect": "解锁双骰：可选择投掷1颗或2颗骰子",
+      "effectFunction": "unlockDoubleDice"
     },
     {
       "id": "legendary_dayunhe",
@@ -280,6 +285,20 @@
       "triggerType": "passive",
       "effect": "碧波荡漾：每回合开始时，名下每张水建筑获得 1金",
       "effectFunction": "water_resonance",
+      "passive": true
+    },
+    {
+      "id": "legendary_damminggong",
+      "name": "大明宫",
+      "element": null,
+      "level": "legendary",
+      "triggerNumbers": [],
+      "cost": 30,
+      "quantity": 4,
+      "maxPerPlayer": 1,
+      "triggerType": "passive",
+      "effect": "盛世繁华：每回合开始根据五行属性数量获得收益（3种+2金，4种+4金，5种+8金）；五行齐全时，任何建筑触发额外从国库获得3金",
+      "effectFunction": "wuxing_synergy",
       "passive": true
     },
     {
