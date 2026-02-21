@@ -277,40 +277,14 @@ function transferGold(from, to, amount, gameState) {
  */
 function processSettlement(diceResult, gameState, currentPlayer, isWeatherTriggered = false) {
   const allResults = [];
-  // 只有乾坤变色模式下，双子点数才会有x2倍数
-  const weatherMultiplier = isWeatherTriggered && diceResult.isDouble && gameState.weatherMode === 'chaos' ? 2 : 1;
+  // 建筑收益不再有全局倍率，改为天气系统单独计算
+  const weatherMultiplier = 1;
 
-  console.log(`[结算] 骰子: ${diceResult.dice.join(', ')}, 总点数: ${diceResult.total}, 倍率: ${weatherMultiplier}x`);
+  console.log(`[结算] 骰子: ${diceResult.dice.join(', ')}, 总点数: ${diceResult.total}, 天气触发: ${isWeatherTriggered && diceResult.isDouble ? '是' : '否'}`);
 
-  // 1. 红色响应（火系建筑）- 掷骰者向别人支付
-  const fireResults = processFireBuildings(diceResult, gameState, currentPlayer, weatherMultiplier);
-  allResults.push(...fireResults);
-
-  // 2. 绿色/白色/黄色收益（木、金、土）
-  const selfResults = processSelfBuildings(diceResult, gameState, currentPlayer, weatherMultiplier);
-  allResults.push(...selfResults);
-
-  // 3. 蓝色收益（水系建筑）- 所有人结算
-  const waterResults = processWaterBuildings(diceResult, gameState, currentPlayer, weatherMultiplier);
-  allResults.push(...waterResults);
-
-  // 4. 检查登高远望（乐游原）
-  if (diceResult.total >= 7) {
-    const prestigeResults = processPrestige(gameState, currentPlayer);
-    allResults.push(...prestigeResults);
-  }
-
-  // 5. 万国来朝收益
-  if (playerHasBuilding(currentPlayer, 'legendary_wanguolaizhao')) {
-    currentPlayer.gold += 10;
-    allResults.push({
-      playerId: currentPlayer.id,
-      goldChange: 10,
-      description: `【万国来朝】${currentPlayer.name} 获得 10 金`,
-    });
-  }
-
-  // 6. 矿冶所被动（每回合从国库获得1金）
+  // ========== 第一阶段：回合开始被动能力（在触发收益之前） ==========
+  
+  // 1. 矿冶所被动（每回合从国库获得1金）
   if (playerHasBuilding(currentPlayer, 'metal_intermediate_kuangyesuo')) {
     if (gameState.treasury >= 1) {
       gameState.treasury -= 1;
@@ -323,9 +297,9 @@ function processSettlement(diceResult, gameState, currentPlayer, isWeatherTrigge
     }
   }
 
-  // 7. 大唐钱庄被动（利息收益）
+  // 2. 大唐钱庄被动（利息收益 - 基于回合开始时的存款）
   if (playerHasBuilding(currentPlayer, 'metal_advanced_datangqianzhuang')) {
-    const interest = Math.max(1, Math.floor(currentPlayer.gold / 5));
+    const interest = Math.max(1, Math.floor(currentPlayer.gold / 10));
     currentPlayer.gold += interest;
     allResults.push({
       playerId: currentPlayer.id,
@@ -334,7 +308,7 @@ function processSettlement(diceResult, gameState, currentPlayer, isWeatherTrigge
     });
   }
 
-  // 8. 大雁塔被动（金系共鸣）
+  // 3. 大雁塔被动（金系共鸣）
   if (playerHasBuilding(currentPlayer, 'legendary_dayanta')) {
     const metalCount = getPlayerBuildingCountByElement(currentPlayer, 'metal');
     if (metalCount > 0) {
@@ -347,7 +321,7 @@ function processSettlement(diceResult, gameState, currentPlayer, isWeatherTrigge
     }
   }
 
-  // 9. 昆明池被动（水系共鸣）
+  // 4. 昆明池被动（水系共鸣）
   if (playerHasBuilding(currentPlayer, 'legendary_kunmingchi')) {
     const waterCount = getPlayerBuildingCountByElement(currentPlayer, 'water');
     if (waterCount > 0) {
@@ -360,17 +334,16 @@ function processSettlement(diceResult, gameState, currentPlayer, isWeatherTrigge
     }
   }
 
-  // 10. 大明宫被动（盛世繁华）- 五行齐全时，每回合开始获得收益
+  // 5. 大明宫被动（盛世繁华）- 回合开始根据属性数量获得收益
   if (playerHasBuilding(currentPlayer, 'legendary_damminggong')) {
     const elementTypes = getPlayerElementTypesCount(currentPlayer);
-    
-    // 回合开始收益（在大雁塔、昆明池之后处理，属于回合开始阶段）
     let turnStartBonus = 0;
-    if (elementTypes >= 3) {
-      if (elementTypes === 3) turnStartBonus = 2;
-      else if (elementTypes === 4) turnStartBonus = 4;
-      else if (elementTypes === 5) turnStartBonus = 8;
-      
+    
+    if (elementTypes === 3) turnStartBonus = 2;
+    else if (elementTypes === 4) turnStartBonus = 4;
+    else if (elementTypes === 5) turnStartBonus = 8;
+    
+    if (turnStartBonus > 0) {
       currentPlayer.gold += turnStartBonus;
       allResults.push({
         playerId: currentPlayer.id,
@@ -378,13 +351,48 @@ function processSettlement(diceResult, gameState, currentPlayer, isWeatherTrigge
         description: `【大明宫】${currentPlayer.name} 盛世繁华（${elementTypes}种属性）获得 ${turnStartBonus} 金`,
       });
     }
+  }
+
+  // ========== 第二阶段：骰子点数触发收益 ==========
+
+  // 6. 红色响应（火系建筑）- 掷骰者向别人支付
+  const fireResults = processFireBuildings(diceResult, gameState, currentPlayer, weatherMultiplier);
+  allResults.push(...fireResults);
+
+  // 7. 绿色/白色/黄色收益（木、金、土）
+  const selfResults = processSelfBuildings(diceResult, gameState, currentPlayer, weatherMultiplier);
+  allResults.push(...selfResults);
+
+  // 8. 蓝色收益（水系建筑）- 所有人结算
+  const waterResults = processWaterBuildings(diceResult, gameState, currentPlayer, weatherMultiplier);
+  allResults.push(...waterResults);
+
+  // 9. 检查登高远望（乐游原）
+  if (diceResult.total >= 7) {
+    const prestigeResults = processPrestige(gameState, currentPlayer);
+    allResults.push(...prestigeResults);
+  }
+
+  // 10. 万国来朝收益
+  if (playerHasBuilding(currentPlayer, 'legendary_wanguolaizhao')) {
+    currentPlayer.gold += 10;
+    allResults.push({
+      playerId: currentPlayer.id,
+      goldChange: 10,
+      description: `【万国来朝】${currentPlayer.name} 获得 10 金`,
+    });
+  }
+
+  // 11. 大明宫额外效果：五行齐全时，任何建筑触发额外从国库获得3金
+  if (playerHasBuilding(currentPlayer, 'legendary_damminggong')) {
+    const elementTypes = getPlayerElementTypesCount(currentPlayer);
     
-    // 五行齐全时的建筑触发额外奖励
-    // 检查是否有真正的建筑触发（排除传奇建筑的固定收益）
+    // 检查是否有建筑触发（排除传奇建筑的固定收益）
     const hasBuildingTriggered = allResults.some(result => 
       result.playerId === currentPlayer.id && 
       result.goldChange > 0 && 
-      !result.description.includes('【观星台】') &&
+      !result.description.includes('【矿冶所】') &&
+      !result.description.includes('【大唐钱庄】') &&
       !result.description.includes('【大雁塔】') &&
       !result.description.includes('【昆明池】') &&
       !result.description.includes('【万国来朝】') &&
@@ -399,7 +407,191 @@ function processSettlement(diceResult, gameState, currentPlayer, isWeatherTrigge
         allResults.push({
           playerId: currentPlayer.id,
           goldChange: treasuryBonus,
-          description: `【大明宫】${currentPlayer.name} 五行齐全，从国库额外获得 ${treasuryBonus} 金`,
+          description: `【大明宫】${currentPlayer.name} 五行齐全，建筑触发额外从国库获得 ${treasuryBonus} 金`,
+        });
+      }
+    }
+  }
+
+  // ========== 第三阶段：天气系统额外奖励 ==========
+  if (isWeatherTriggered && diceResult.isDouble) {
+    const doubleNumber = diceResult.dice[0];
+    
+    if (gameState.weatherMode === 'prosperity') {
+      // 贞观盛世模式：基础5金 + 对应属性建筑加成
+      let goldGain = 0;
+      let elementType = '';
+      let elementCount = 0;
+      
+      switch (doubleNumber) {
+        case 1: // 甘霖（水）
+          elementType = '水';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'water');
+          goldGain = 5 + elementCount * 1;
+          break;
+        case 2: // 回春（木）
+          elementType = '木';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'wood');
+          goldGain = 5 + elementCount * 1;
+          break;
+        case 3: // 地灵（土）
+          elementType = '土';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'earth');
+          goldGain = 5 + elementCount * 1;
+          break;
+        case 4: // 烛照（火）
+          elementType = '火';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'fire');
+          goldGain = 5 + elementCount * 1;
+          break;
+        case 5: // 瑞雪（金）
+          elementType = '金';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'metal');
+          goldGain = 5 + elementCount * 1;
+          break;
+        case 6: // 盛世
+          goldGain = 12;
+          break;
+      }
+      
+      currentPlayer.gold += goldGain;
+      const desc = doubleNumber === 6 
+        ? `【天时·贞观盛世】${currentPlayer.name} 双子(6,6)盛世降临，获得 ${goldGain} 金`
+        : `【天时·贞观盛世】${currentPlayer.name} 双子(${doubleNumber},${doubleNumber})，获得 5金（基础）+ ${elementCount}金（${elementType}系建筑）= ${goldGain} 金`;
+      
+      allResults.push({
+        playerId: currentPlayer.id,
+        goldChange: goldGain,
+        description: desc,
+      });
+    } else if (gameState.weatherMode === 'chaos') {
+      // 乾坤变色模式：对应属性建筑数量 x3 金币奖励
+      let elementType = '';
+      let elementCount = 0;
+      let weatherName = '';
+      
+      switch (doubleNumber) {
+        case 1: // 洪涝
+          weatherName = '洪涝';
+          elementType = '水';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'water');
+          break;
+        case 2: // 大风
+          weatherName = '大风';
+          elementType = '木';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'wood');
+          break;
+        case 3: // 地动
+          weatherName = '地动';
+          elementType = '土';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'earth');
+          break;
+        case 4: // 大旱
+          weatherName = '大旱';
+          elementType = '火';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'fire');
+          break;
+        case 5: // 霜降
+          weatherName = '霜降';
+          elementType = '金';
+          elementCount = getPlayerBuildingCountByElement(currentPlayer, 'metal');
+          break;
+        case 6: // 日食
+          weatherName = '日食';
+          // (6,6)日食特殊：获得国库全部金币，其他玩家被罚15金
+          const treasuryGold = gameState.treasury;
+          if (treasuryGold > 0) {
+            currentPlayer.gold += treasuryGold;
+            gameState.treasury = 0;
+            allResults.push({
+              playerId: currentPlayer.id,
+              goldChange: treasuryGold,
+              description: `【天时·日食】${currentPlayer.name} 获得国库全部金币 ${treasuryGold} 金`,
+            });
+          }
+          
+          // 其他玩家被罚15金到国库
+          gameState.players.forEach(otherPlayer => {
+            if (otherPlayer.id === currentPlayer.id) return;
+            
+            const penalty = Math.min(15, otherPlayer.gold);
+            if (penalty > 0) {
+              otherPlayer.gold -= penalty;
+              gameState.treasury += penalty;
+              
+              allResults.push({
+                playerId: otherPlayer.id,
+                goldChange: -penalty,
+                description: `【天时·日食】${otherPlayer.name} 被罚 ${penalty} 金到国库`,
+              });
+            }
+          });
+          break;
+      }
+      
+      // 对应属性建筑奖励（1-5点）
+      if (doubleNumber >= 1 && doubleNumber <= 5) {
+        const goldGain = elementCount * 3;
+        if (goldGain > 0) {
+          currentPlayer.gold += goldGain;
+          allResults.push({
+            playerId: currentPlayer.id,
+            goldChange: goldGain,
+            description: `【天时·${weatherName}】${currentPlayer.name} 拥有 ${elementCount} 个${elementType}系建筑，获得 ${goldGain} 金`,
+          });
+        }
+      }
+      
+      // 相克惩罚：对其他玩家的相克属性建筑征收3金/张
+      const counterElementMap = {
+        water: 'fire',   // 水克火
+        fire: 'metal',   // 火克金
+        metal: 'wood',   // 金克木
+        wood: 'earth',   // 木克土
+        earth: 'water',  // 土克水
+      };
+      
+      const elementNames = {
+        wood: '木',
+        fire: '火',
+        earth: '土',
+        metal: '金',
+        water: '水',
+      };
+      
+      // 只有1-5点数才有相克关系
+      if (doubleNumber >= 1 && doubleNumber <= 5) {
+        const diceElementMap = {
+          1: 'water',
+          2: 'wood',
+          3: 'earth',
+          4: 'fire',
+          5: 'metal',
+        };
+        
+        const diceElement = diceElementMap[doubleNumber];
+        const counteredElement = counterElementMap[diceElement];
+        
+        // 对除当前玩家外的所有玩家征收相克惩罚
+        gameState.players.forEach(otherPlayer => {
+          if (otherPlayer.id === currentPlayer.id) return;
+          
+          const counteredBuildingCount = getPlayerBuildingCountByElement(otherPlayer, counteredElement);
+          if (counteredBuildingCount > 0) {
+            const penalty = counteredBuildingCount * 3;
+            const actualPenalty = Math.min(penalty, otherPlayer.gold);
+            
+            if (actualPenalty > 0) {
+              otherPlayer.gold -= actualPenalty;
+              gameState.treasury += actualPenalty;
+              
+              allResults.push({
+                playerId: otherPlayer.id,
+                goldChange: -actualPenalty,
+                description: `【天时·相克】${otherPlayer.name} 因 ${counteredBuildingCount} 个${elementNames[counteredElement]}系建筑被${elementNames[diceElement]}克，缴纳 ${actualPenalty} 金到国库`,
+              });
+            }
+          }
         });
       }
     }
@@ -628,11 +820,12 @@ function processSelfBuildings(diceResult, gameState, currentPlayer, multiplier) 
         break;
       case 'metal_advanced_datangqianzhuang':
         goldGain = Math.min(Math.floor(currentPlayer.gold * 0.3), 25) * multiplier;
-        const treasuryGain = Math.min(gameState.treasury, 5);
-        if (treasuryGain > 0) {
-          gameState.treasury -= treasuryGain;
-          goldGain += treasuryGain;
-          extraEffect = `，从国库获得 ${treasuryGain} 金`;
+        const baseTreasuryGain = Math.min(gameState.treasury, 5);
+        if (baseTreasuryGain > 0) {
+          gameState.treasury -= baseTreasuryGain;
+          const treasuryGainWithMultiplier = baseTreasuryGain * multiplier;
+          goldGain += treasuryGainWithMultiplier;
+          extraEffect = `，从国库获得 ${treasuryGainWithMultiplier} 金`;
         }
         break;
       case 'earth_basic_caishichang':
@@ -654,20 +847,27 @@ function processSelfBuildings(diceResult, gameState, currentPlayer, multiplier) 
     }
 
     if (goldGain > 0) {
-      // 检查大运河加成 - 每回合只触发一次
-      if (config.element === 'wood' && hasGrandCanal(currentPlayer) && !currentPlayer.grandCanalTriggered) {
-        const waterBonus = getPlayerBuildingCountByElement(currentPlayer, 'water') * 2;
-        goldGain += waterBonus;
-        extraEffect += `，【大运河】水木相生额外获得 ${waterBonus} 金`;
-        currentPlayer.grandCanalTriggered = true;
-      }
-
+      // 先添加建筑本身的触发收益
       currentPlayer.gold += goldGain;
       results.push({
         playerId: currentPlayer.id,
         goldChange: goldGain,
         description: `${currentPlayer.name} 的【${config.name}】触发，获得 ${goldGain} 金${extraEffect}`,
       });
+      
+      // 检查大运河加成 - 每回合只触发一次，单独添加一条结算记录
+      if (config.element === 'wood' && hasGrandCanal(currentPlayer) && !currentPlayer.grandCanalTriggered) {
+        const waterBonus = getPlayerBuildingCountByElement(currentPlayer, 'water') * 2;
+        if (waterBonus > 0) {
+          currentPlayer.gold += waterBonus;
+          results.push({
+            playerId: currentPlayer.id,
+            goldChange: waterBonus,
+            description: `【大运河】${currentPlayer.name} 水木相生，额外获得 ${waterBonus} 金（水系建筑 x2）`,
+          });
+        }
+        currentPlayer.grandCanalTriggered = true;
+      }
     } else if (extraEffect) {
       results.push({
         playerId: currentPlayer.id,

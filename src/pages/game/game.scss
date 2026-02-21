@@ -248,6 +248,7 @@ taro-button-core {
       .player-resources {
         display: flex;
         gap: 20px;
+        align-items: center;
 
         .gold, .upgrade-card {
           font-size: 28px;
@@ -258,6 +259,31 @@ taro-button-core {
         .upgrade-card {
           color: #FFD700;
           text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+        }
+
+        taro-button-core.sell-card-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 6px 12px;
+          margin: 0;
+          min-height: auto;
+          height: auto;
+          line-height: normal;
+          font-size: 22px;
+          
+          background: linear-gradient(135deg, rgba(139, 69, 19, 0.5), rgba(101, 50, 14, 0.5)) !important;
+          border: 2px solid rgba(255, 215, 0, 0.5) !important;
+          border-radius: 8px;
+          color: #FFD700 !important;
+          
+          &::after {
+            display: none;
+          }
+          
+          &:active {
+            transform: scale(0.95);
+          }
         }
       }
     }
@@ -587,6 +613,11 @@ taro-button-core {
   backdrop-filter: blur(10px);
   animation: slideUp 0.3s;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  
+  // 使用 flex 布局确保内容区域可以正确滚动
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // 防止整个弹窗溢出
 }
 
 @keyframes slideUp {
@@ -607,6 +638,7 @@ taro-button-core {
   margin-bottom: 25px;
   padding-bottom: 20px;
   border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+  flex-shrink: 0; // 防止 header 被压缩
 
   .modal-title {
     font-size: 36px;
@@ -646,6 +678,7 @@ taro-button-core {
   border-top: 2px solid rgba(212, 175, 55, 0.3);
   border-bottom: 2px solid rgba(212, 175, 55, 0.3);
   text-align: center;
+  flex-shrink: 0; // 防止骰子结果被压缩
 
   .dice-result-text {
     font-size: 30px;
@@ -662,7 +695,8 @@ taro-button-core {
 }
 
 .modal-content {
-  max-height: calc(70vh - 150px);
+  flex: 1 1 auto; // 占据剩余空间
+  min-height: 0; // 允许收缩
   overflow-y: auto; // 添加滚动条
   overflow-x: hidden;
   padding-right: 10px; // 给滚动条留出空间

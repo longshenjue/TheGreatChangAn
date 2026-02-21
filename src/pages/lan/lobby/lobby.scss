@@ -140,18 +140,23 @@
         }
       }
 
-      taro-button-core.refresh-btn {
+      // 刷新按钮 - 禁用状态
+      taro-button-core.refresh-btn[disabled="true"] {
+        background: rgba(255, 255, 255, 0.1) !important;
+        background-color: transparent !important;
+        border: none !important;
+        color: rgba(255, 255, 255, 0.3) !important;
+      }
+      
+      // 刷新按钮 - 正常状态
+      taro-button-core.refresh-btn[disabled="false"],
+      taro-button-core.refresh-btn:not([disabled]) {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         background-color: transparent !important;
         border: none !important;
         color: #fff !important;
 
-        &[disabled] {
-          background: rgba(255, 255, 255, 0.1) !important;
-          color: rgba(255, 255, 255, 0.3) !important;
-        }
-
-        &:active:not([disabled]) {
+        &:active {
           transform: translateY(2px);
         }
       }
@@ -207,8 +212,22 @@
         }
       }
 
-      // 创建房间按钮
-      taro-button-core.create-room-btn {
+      // 创建房间按钮 - 禁用状态
+      taro-button-core.create-room-btn[disabled="true"] {
+        flex: 0 0 auto;
+        width: 160px;
+        max-width: 160px;
+        min-width: 160px;
+        height: 70px;
+        padding: 0 30px;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.3);
+        box-shadow: none;
+      }
+      
+      // 创建房间按钮 - 正常状态
+      taro-button-core.create-room-btn[disabled="false"],
+      taro-button-core.create-room-btn:not([disabled]) {
         flex: 0 0 auto;
         width: 160px;
         max-width: 160px;
@@ -219,13 +238,7 @@
         color: #fff;
         box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
 
-        &[disabled] {
-          background: rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.3);
-          box-shadow: none;
-        }
-
-        &:active:not([disabled]) {
+        &:active {
           transform: translateY(2px);
           box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
         }
@@ -264,8 +277,22 @@
         }
       }
 
-      // 加入按钮
-      taro-button-core.join-btn {
+      // 加入按钮 - 禁用状态
+      taro-button-core.join-btn[disabled="true"] {
+        flex: 0 0 auto;
+        width: 160px;
+        max-width: 160px;
+        min-width: 160px;
+        height: 70px;
+        padding: 0 30px;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.3);
+        box-shadow: none;
+      }
+      
+      // 加入按钮 - 正常状态
+      taro-button-core.join-btn[disabled="false"],
+      taro-button-core.join-btn:not([disabled]) {
         flex: 0 0 auto;
         width: 160px;
         max-width: 160px;
@@ -276,13 +303,7 @@
         color: #fff;
         box-shadow: 0 4px 16px rgba(240, 147, 251, 0.4);
 
-        &[disabled] {
-          background: rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.3);
-          box-shadow: none;
-        }
-
-        &:active:not([disabled]) {
+        &:active {
           transform: translateY(2px);
           box-shadow: 0 2px 10px rgba(240, 147, 251, 0.4);
         }
@@ -501,11 +522,12 @@
             border-color: rgba(255, 215, 0, 0.6);
           }
 
-          &[disabled] {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.4);
-            box-shadow: none;
+          // 禁用状态需要精确匹配 disabled="true"
+          &[disabled="true"] {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            box-shadow: none !important;
             cursor: not-allowed;
             transform: none;
 
@@ -519,7 +541,7 @@
             }
           }
 
-          &:active:not([disabled]) {
+          &:active:not([disabled="true"]) {
             transform: translateY(-1px) scale(1.02);
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
           }

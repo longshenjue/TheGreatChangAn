@@ -27,6 +27,7 @@ import {
 } from '../../utils/gameEngine';
 import { processSettlement, purchaseBuilding } from '../../utils/settlement';
 import lanService from '../../services/lanService';
+import { soundManager } from '../../utils/soundEffects';
 import './game.scss';
 
 // 骰子点数显示组件（使用真实点数）
@@ -143,6 +144,14 @@ export default function Game() {
         // 显示购买结果
         if (result.purchased && result.building) {
           const isLegendary = result.building.level === 'legendary';
+          
+          // 播放购买音效
+          if (isLegendary) {
+            soundManager.playLegendaryPurchase();
+          } else {
+            soundManager.playPurchase();
+          }
+          
           setPurchaseAnimation({
             show: true,
             buildingName: result.building.name,
@@ -175,13 +184,17 @@ export default function Game() {
                   if (res.confirm) {
                     // 返回房间，准备下一局
                     if (isLANMode && roomId) {
-                      Taro.redirectTo({ url: `/pages/lan/room/room?roomId=${roomId}` });
+                      console.log('🔄 游戏结束，返回房间:', roomId);
+                      // 使用 reLaunch 重新加载房间页面，避免页面栈问题
+                      Taro.reLaunch({ 
+                        url: `/pages/lan/room/room?roomId=${roomId}` 
+                      });
                     } else {
-                      Taro.redirectTo({ url: '/pages/welcome/welcome' });
+                      Taro.reLaunch({ url: '/pages/welcome/welcome' });
                     }
                   } else {
                     // 回到首页
-                    Taro.redirectTo({ url: '/pages/welcome/welcome' });
+                    Taro.reLaunch({ url: '/pages/welcome/welcome' });
                   }
                 },
               });
@@ -317,6 +330,9 @@ export default function Game() {
 
   // 投掷骰子
   const handleRollDice = (count: 1 | 2) => {
+    // 播放骰子音效
+    soundManager.playDiceRoll();
+    
     if (isLANMode && roomId) {
       // 联机模式：只发送指令给服务器
       console.log('📤 发送投骰子指令到服务器', {
@@ -487,8 +503,15 @@ export default function Game() {
       const result = purchaseBuilding(currentPlayer, buildingId, gameState);
       
       if (result.success) {
-        // 显示购买成功动画
+        // 播放购买音效
         const isLegendary = config?.level === 'legendary';
+        if (isLegendary) {
+          soundManager.playLegendaryPurchase();
+        } else {
+          soundManager.playPurchase();
+        }
+        
+        // 显示购买成功动画
         setPurchaseAnimation({ show: true, buildingName: config?.name || '', isLegendary });
         // 传奇建筑动画持续更久
         const animationDuration = isLegendary ? 5000 : 2000;
@@ -550,6 +573,40 @@ export default function Game() {
           duration: 2000,
         });
       }
+    }
+  };
+
+  // 卖升级卡
+  const handleSellUpgradeCard = (count: number) => {
+    // 播放卖卡音效
+    soundManager.playSellCard();
+    
+    if (isLANMode && roomId) {
+      // LAN模式：发送卖卡请求到服务器
+      lanService.sendGameAction(roomId, 'sellUpgradeCard', {
+        count
+      });
+    } else {
+      // 单机模式：本地执行
+      if (!currentPlayer.upgradeCards || currentPlayer.upgradeCards < count) {
+        Taro.showToast({
+          title: '升级卡不足',
+          icon: 'none',
+          duration: 2000,
+        });
+        return;
+      }
+
+      currentPlayer.upgradeCards -= count;
+      currentPlayer.gold += count;
+      
+      setGameState({ ...gameState });
+      
+      Taro.showToast({
+        title: `卖出${count}张升级卡，获得${count}金`,
+        icon: 'success',
+        duration: 2000,
+      });
     }
   };
 
@@ -635,7 +692,29 @@ export default function Game() {
               <View className="player-resources">
                 <Text className="gold">💰 {player.gold}</Text>
                 {(player.upgradeCards || 0) > 0 && (
-                  <Text className="upgrade-card">🎫 {player.upgradeCards}</Text>
+                  <>
+                    <Text className="upgrade-card">🎫 {player.upgradeCards}</Text>
+                    {index === gameState.currentPlayerIndex && isMyTurn && (
+                      <Button
+                        className="sell-card-btn"
+                        onClick={() => {
+                          if (player.upgradeCards && player.upgradeCards > 0) {
+                            Taro.showModal({
+                              title: '卖出升级卡',
+                              content: `确认卖出1张升级卡，获得1金？\n（当前：${player.upgradeCards}张）`,
+                              success: (res) => {
+                                if (res.confirm) {
+                                  handleSellUpgradeCard(1);
+                                }
+                              }
+                            });
+                          }
+                        }}
+                      >
+                        卖卡
+                      </Button>
+                    )}
+                  </>
                 )}
               </View>
             </View>
@@ -751,7 +830,7 @@ export default function Game() {
                   className={`dice dice-real ${canFlipDice ? 'flippable' : ''}`}
                   onClick={() => canFlipDice && handleFlipDice(2)}
                 >
-                  <DiceDots value={diceResult.dice2} />
+                  <DiceDots value={diceResult.dice2 || 1} />
                 </View>
               </>
             )}
@@ -800,6 +879,7 @@ export default function Game() {
                 const playerGroups: { [playerId: string]: { 
                   player: Player,
                   incomeBuildings: { [buildingName: string]: { totalGold: number; count: number } },
+                  passiveIncome: typeof settlementResults, // 被动收益（不合并）
                   expenses: typeof settlementResults,
                   special: typeof settlementResults,
                   totalGold: number,
@@ -811,6 +891,7 @@ export default function Game() {
                 playerGroups[player.id] = {
                   player,
                   incomeBuildings: {}, // 自己建筑的收益（可合并）
+                  passiveIncome: [],   // 被动收益（不合并）
                   expenses: [],        // 支付给他人的损失（不合并）
                   special: [],         // 特殊效果
                   totalGold: 0,
@@ -845,12 +926,21 @@ export default function Game() {
                     const buildingName = buildingMatch[1];
                     // 判断是收益还是支出
                     const isExpense = result.description.includes('支付') || result.description.includes('向');
+                    // 判断是否是被动收益（不应合并）
+                    const isPassiveIncome = result.description.includes('从国库') || 
+                                          result.description.includes('被动') ||
+                                          result.description.includes('每回合') ||
+                                          result.description.includes('存款') ||
+                                          result.description.includes('利息');
                     
                     if (isExpense) {
                       // 支出：单独显示，不合并
                       group.expenses.push(result);
+                    } else if (isPassiveIncome) {
+                      // 被动收益：单独显示，不合并
+                      group.passiveIncome.push(result);
                     } else {
-                      // 收益：合并相同建筑
+                      // 收益：仅合并触发收益
                       if (group.incomeBuildings[buildingName]) {
                         group.incomeBuildings[buildingName].totalGold += result.goldChange;
                         group.incomeBuildings[buildingName].count++;
@@ -874,6 +964,7 @@ export default function Game() {
                       // 跳过没有任何收益变化的玩家
                       if (group.totalGold === 0 && 
                           Object.keys(group.incomeBuildings).length === 0 && 
+                          group.passiveIncome.length === 0 &&
                           group.expenses.length === 0 &&
                           group.special.length === 0) {
                         return null;
@@ -881,6 +972,12 @@ export default function Game() {
 
                       return (
                         <View key={`player-${groupIndex}`} className="player-settlement-group">
+                          {/* 玩家被动收益 */}
+                          {group.passiveIncome.map((result, index) => (
+                            <View key={`passive-${groupIndex}-${index}`} className="log-item">
+                              <Text className="log-text">{result.description}</Text>
+                            </View>
+                          ))}
                           {/* 玩家建筑收益 */}
                           {Object.entries(group.incomeBuildings).map(([buildingName, buildingData], index) => (
                             <View key={`income-${groupIndex}-${index}`} className="log-item">
@@ -947,12 +1044,10 @@ export default function Game() {
           <Button
             className="action-btn shop-btn"
             onClick={() => {
-              if (isLANMode && !isMyTurn) return;
               setShowBuildingShop(true);
             }}
-            disabled={isLANMode && !isMyTurn}
           >
-            建筑商店 {isLANMode && !isMyTurn && '(等待中)'}
+            建筑商店 {isLANMode && !isMyTurn && '(仅查看)'}
           </Button>
           <Button 
             className="action-btn end-btn" 
@@ -1084,6 +1179,7 @@ export default function Game() {
                       className={`buy-btn ${canAfford || isFree || isDirectBuy ? 'can-afford' : ''} ${isFree || isDirectBuy ? 'free' : ''}`}
                       onClick={() => handlePurchase(buildingId)}
                       disabled={
+                        (isLANMode && !isMyTurn) ||
                         (hasPurchased && !currentPlayer.canBuyExtra && !currentPlayer.canFreeBuilding && !currentPlayer.canDirectBuyAdvanced) ||
                         !canAfford
                       }

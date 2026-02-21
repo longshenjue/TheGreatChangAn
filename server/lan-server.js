@@ -724,6 +724,9 @@ wss.on('connection', (ws, req) => {
         case 'purchaseBuilding':
           result = handlePurchaseBuilding(room, message.data);
           break;
+        case 'sellUpgradeCard':
+          result = handleSellUpgradeCard(room, message.data);
+          break;
         case 'endTurn':
           result = handleEndTurn(room, message.data);
           break;
@@ -782,8 +785,9 @@ wss.on('connection', (ws, req) => {
     console.log('    - 总和:', diceResult.total);
     console.log('    - 是否对子:', diceResult.isDouble ? '是' : '否');
     
-    // 处理结算
-    const settlementResults = gameEngine.processSettlement(diceResult, gameState, currentPlayer);
+    // 处理结算（天气系统：对子时触发）
+    const isWeatherTriggered = diceResult.isDouble;
+    const settlementResults = gameEngine.processSettlement(diceResult, gameState, currentPlayer, isWeatherTriggered);
     
     console.log('  结算结果:');
     if (settlementResults && settlementResults.length > 0) {
@@ -798,6 +802,29 @@ wss.on('connection', (ws, req) => {
     console.log('  投骰后状态:');
     console.log('    - 金币:', currentPlayer.gold);
     console.log('✅ [投骰子] 处理完成\n');
+
+    // 检查胜利条件（万国来朝可能在结算后达到99金）
+    const winCheck = gameEngine.checkWinCondition(gameState);
+    if (winCheck.hasWinner) {
+      console.log(`🎉 游戏结束！胜者: ${winCheck.winner.name}`);
+      
+      // 将房间状态设置为finished
+      room.status = 'finished';
+      room.winner = winCheck.winner;
+      
+      return {
+        success: true,
+        data: {
+          diceResult,
+          settlementResults,
+          gameOver: true,
+          winner: winCheck.winner,
+          winType: winCheck.winType,
+          totalAssets: winCheck.totalAssets,
+          message: winCheck.message
+        }
+      };
+    }
 
     return {
       success: true,
@@ -827,8 +854,30 @@ wss.on('connection', (ws, req) => {
       total: flipped 
     };
     
-    // 处理结算
-    const settlementResults = gameEngine.processSettlement(diceResult, gameState, currentPlayer);
+    // 处理结算（翻转后不触发天气效果）
+    const settlementResults = gameEngine.processSettlement(diceResult, gameState, currentPlayer, false);
+
+    // 检查胜利条件（万国来朝可能在结算后达到99金）
+    const winCheck = gameEngine.checkWinCondition(gameState);
+    if (winCheck.hasWinner) {
+      console.log(`🎉 游戏结束！胜者: ${winCheck.winner.name}`);
+      
+      room.status = 'finished';
+      room.winner = winCheck.winner;
+      
+      return {
+        success: true,
+        data: {
+          diceResult,
+          settlementResults,
+          gameOver: true,
+          winner: winCheck.winner,
+          winType: winCheck.winType,
+          totalAssets: winCheck.totalAssets,
+          message: winCheck.message
+        }
+      };
+    }
 
     return {
       success: true,
@@ -930,6 +979,42 @@ wss.on('connection', (ws, req) => {
       type: 'gameRestarted',
       data: { message: '房主已重新开始游戏，请重新准备' }
     });
+  }
+
+  // 处理卖升级卡
+  function handleSellUpgradeCard(room, data) {
+    const { count } = data;
+    const gameState = room.gameState;
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+
+    console.log(`💰 ${currentPlayer.name} 卖升级卡: ${count}张`);
+
+    // 检查是否有足够的升级卡
+    if (!currentPlayer.upgradeCards || currentPlayer.upgradeCards < count) {
+      console.log('❌ 升级卡不足');
+      return {
+        success: false,
+        message: '升级卡不足'
+      };
+    }
+
+    // 扣除升级卡，增加金币
+    currentPlayer.upgradeCards -= count;
+    currentPlayer.gold += count;
+
+    console.log(`✅ 卖出成功: -${count}张升级卡, +${count}金`);
+    console.log(`  剩余升级卡: ${currentPlayer.upgradeCards}张`);
+    console.log(`  当前金币: ${currentPlayer.gold}金`);
+
+    return {
+      success: true,
+      data: {
+        playerIndex: gameState.currentPlayerIndex,
+        upgradeCards: currentPlayer.upgradeCards,
+        gold: currentPlayer.gold,
+        message: `卖出${count}张升级卡，获得${count}金`
+      }
+    };
   }
 
   // 处理结束回合

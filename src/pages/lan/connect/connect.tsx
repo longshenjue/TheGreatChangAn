@@ -1,5 +1,5 @@
 import { View, Button, Input, Text } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { useState, useEffect } from 'react';
 import lanService from '../../../services/lanService';
 import { getServerConfig } from '../../../config/server';
@@ -13,10 +13,20 @@ export default function LANConnect() {
   const [isWeapp, setIsWeapp] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false); // 是否显示高级选项
 
+  // 页面重新显示时重置连接状态
+  useDidShow(() => {
+    console.log('📱 连接页面重新显示，重置连接状态');
+    setConnecting(false);
+  });
+
   useEffect(() => {
     // ⚠️ 【修复 Bug #2】页面加载时清理可能的残留状态
     // 如果从大厅返回，确保清理连接状态和 DOM
     console.log('🔄 [连接页面] 页面加载，检查连接状态');
+    
+    // 强制重置连接状态，避免残留的 connecting=true 导致按钮禁用
+    setConnecting(false);
+    console.log('🔄 已重置连接状态为 false');
     
     // 检查环境
     setIsWeapp(process.env.TARO_ENV === 'weapp');
@@ -36,9 +46,13 @@ export default function LANConnect() {
     const lastNickname = Taro.getStorageSync('lan_nickname');
 
     // 优先级：URL参数 > localStorage > 默认配置
+    // 定义在外层作用域，供后续使用
+    let urlIP = '';
+    let urlPort = '';
+    
     // IP地址
     if (params?.ip) {
-      const urlIP = decodeURIComponent(params.ip);
+      urlIP = decodeURIComponent(params.ip);
       console.log('  从URL获取IP:', urlIP);
       setServerIP(urlIP);
     } else {
@@ -47,7 +61,7 @@ export default function LANConnect() {
     
     // 端口
     if (params?.port) {
-      const urlPort = decodeURIComponent(params.port);
+      urlPort = decodeURIComponent(params.port);
       console.log('  从URL获取端口:', urlPort);
       setServerPort(urlPort);
     } else {
@@ -565,7 +579,7 @@ export default function LANConnect() {
         
         {/* 快速连接按钮 */}
         <Button
-          className="quick-connect-btn"
+          className="lan-connect-start-btn"
           onClick={quickConnect}
           disabled={connecting || !nickname.trim()}
         >

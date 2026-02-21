@@ -9,6 +9,63 @@
     writing-mode: horizontal-tb;
     text-orientation: mixed;
   }
+  
+  // ⚠️ 重要：覆盖 game.scss 中的全局 taro-button-core 重置
+  // game.scss 设置了 background: none !important，会影响本页面
+  taro-button-core {
+    // 取消 game.scss 的重置，恢复正常状态
+    background: initial !important;
+    padding: initial !important;
+    margin: initial !important;
+  }
+  
+  // 局域网连接页面专用按钮样式
+  
+  // 禁用状态（必须放在前面，优先级较低）
+  .section taro-button-core.lan-connect-start-btn[disabled="true"],
+  taro-button-core.lan-connect-start-btn[disabled="true"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 80px;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 14px;
+    padding: 20px !important;
+    margin-top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+  
+  // 正常状态（放在后面，优先级较高，覆盖上面的规则）
+  .section taro-button-core.lan-connect-start-btn[disabled="false"],
+  taro-button-core.lan-connect-start-btn[disabled="false"],
+  .section taro-button-core.lan-connect-start-btn:not([disabled]),
+  taro-button-core.lan-connect-start-btn:not([disabled]) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 80px;
+    // 核心视觉属性使用 !important（覆盖游戏页面的全局重置）
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4) !important;
+    // 布局属性
+    border-radius: 14px;
+    padding: 20px !important;  // 覆盖 game.scss 的 padding: 0
+    margin-top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1.2;
+  }
 
   .header {
     text-align: center;
@@ -71,29 +128,6 @@
       }
     }
 
-    .quick-connect-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      padding: 20px;
-      font-size: 28px;
-      font-weight: bold;
-      box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
-      margin-top: 10px;
-
-      &:disabled {
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 0.3);
-        box-shadow: none;
-      }
-
-      &:active:not(:disabled) {
-        transform: translateY(2px);
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
-      }
-    }
 
     .quick-hint {
       display: block;

@@ -140,14 +140,14 @@ export default function Index() {
               onClick={() => setWeatherMode('prosperity')}
             >
               <Text className="weather-name">贞观盛世</Text>
-              <Text className="weather-desc">简单收益模式</Text>
+              <Text className="weather-desc">对子奖励：5金+对应属性建筑数</Text>
             </View>
             <View
               className={`weather-option ${weatherMode === 'chaos' ? 'active' : ''}`}
               onClick={() => setWeatherMode('chaos')}
             >
               <Text className="weather-name">乾坤变色</Text>
-              <Text className="weather-desc">复杂博弈模式</Text>
+              <Text className="weather-desc">对子奖励：属性建筑数x3金+相克惩罚</Text>
             </View>
           </View>
         </View>

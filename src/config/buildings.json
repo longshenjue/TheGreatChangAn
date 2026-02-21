@@ -158,7 +158,7 @@
       "requiresUpgradeCards": 3,
       "upgradeFrom": "metal_intermediate_kuangyesuo",
       "triggerType": "self_roll",
-      "effect": "自己掷出：现金增加 30%（上限 25金），并从国库获得 5金。被动：每回合开始获得存款的 1/5 利息（向下取整，至少1金）。（需要3张升级卡）",
+      "effect": "自己掷出：现金增加 30%（上限 25金），并从国库获得 5金。被动：每回合开始获得存款的 1/10 利息（向下取整，至少1金）。（需要3张升级卡）",
       "effectFunction": "increaseGoldAndTreasury",
       "passive": true
     },

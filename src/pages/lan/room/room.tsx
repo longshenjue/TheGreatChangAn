@@ -1,5 +1,5 @@
 import { View, Button, Text, Image, ScrollView } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { useState, useEffect, useRef } from 'react';
 import lanService from '../../../services/lanService';
 import { generateQRCodeDataURL, generateConnectionText } from '../../../utils/qrcode';
@@ -77,6 +77,14 @@ export default function LANRoom() {
       lanService.off('gameStarted', handleGameStarted);
     };
   }, []);
+
+  // 页面重新显示时刷新房间信息
+  useDidShow(() => {
+    console.log('📱 房间页面重新显示，刷新房间信息');
+    if (roomId.current) {
+      refreshRoom();
+    }
+  });
 
   // 初始化房间
   const initRoom = () => {
@@ -255,8 +263,8 @@ export default function LANRoom() {
       
       console.log('🚀 跳转到游戏页面:', gameUrl);
       
-      // 直接跳转到联机游戏页面
-      Taro.redirectTo({ url: gameUrl });
+      // 使用navigateTo保留页面栈，方便游戏结束后返回
+      Taro.navigateTo({ url: gameUrl });
     }
   };
 
@@ -589,7 +597,7 @@ export default function LANRoom() {
               >
                 <View className="weather-btn-content">
                   <Text className="weather-name">贞观盛世</Text>
-                  <Text className="weather-desc">简单收益模式</Text>
+                  <Text className="weather-desc">对子：5金+属性建筑数</Text>
                 </View>
               </Button>
               <Button
@@ -599,7 +607,7 @@ export default function LANRoom() {
               >
                 <View className="weather-btn-content">
                   <Text className="weather-name">乾坤变色</Text>
-                  <Text className="weather-desc">复杂博弈模式</Text>
+                  <Text className="weather-desc">对子：建筑数x3金+相克惩罚</Text>
                 </View>
               </Button>
             </View>

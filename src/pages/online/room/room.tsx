@@ -541,7 +541,7 @@ export default function Room() {
               >
                 <View className="weather-btn-content">
                   <Text className="weather-name">贞观盛世</Text>
-                  <Text className="weather-desc">简单收益模式</Text>
+                  <Text className="weather-desc">对子：5金+属性建筑数</Text>
                 </View>
               </Button>
               <Button 
@@ -551,7 +551,7 @@ export default function Room() {
               >
                 <View className="weather-btn-content">
                   <Text className="weather-name">乾坤变色</Text>
-                  <Text className="weather-desc">复杂博弈模式</Text>
+                  <Text className="weather-desc">对子：建筑数x3金+相克惩罚</Text>
                 </View>
               </Button>
             </View>
